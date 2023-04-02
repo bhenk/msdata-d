@@ -1,0 +1,11 @@
+/.phpunit.result.cache
+/logs/
+/vendor/
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/msdata-d.iml
+/docker/notes.txt
+/.idea/php.xml
+/.idea/php-test-framework.xml
+/.idea/vcs.xml

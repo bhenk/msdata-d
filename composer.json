@@ -1,0 +1,24 @@
+{
+  "name": "bhenk/msdata-d",
+  "description": "MySql DAO",
+  "minimum-stability": "stable",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "henk van den berg",
+      "homepage": "https://gitzw.art"
+    }
+  ],
+  "require": {
+    "php": ">=8.2",
+    "ext-mysqli": "*",
+    "bhenk/logger": "^1.0",
+    "ext-openssl": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.0"
+  },
+  "autoload": {
+    "psr-4": {"bhenk\\": "src/bhenk"}
+  }
+}
