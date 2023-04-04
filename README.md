@@ -1,3 +1,6 @@
+[![Documentation Status](https://readthedocs.org/projects/bhenkmsdata/badge/?version=latest)](https://bhenkmsdata.readthedocs.io/en/latest/?badge=latest)
+<img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/bhenk/msdata-d">
+
 # msData-d
 
 **Basic Data Object and Data Access Object implementations for MySql database**
