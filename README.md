@@ -2,9 +2,10 @@
 
 Basic Data Object and Data Access Object implementations for MySql database
 
-msData is written in PHP \
-Requirement: php >=8.1 \
-Tested against MySql version 8.0.32
+* msData is written in PHP
+* Requirement: php >=8.1
+* Tested against MySql version 8.0.32
+* Documentation: http://bhenkmsdata.rtfd.io/
 
 ## Installation
 
