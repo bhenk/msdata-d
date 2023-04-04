@@ -47,7 +47,7 @@ class PersonDaoTest extends TestCase {
         $per2->setKnows(102);
         $result = $dao->update($per2);
 
-        assertTrue($result);
+        assertEquals(1, $result);
     }
 
 }

@@ -109,7 +109,7 @@ class AbstractDaoTest extends TestCase {
         assertTrue($thrown);
     }
 
-    #[LogAttribute(false)]
+    #[LogAttribute(true)]
     public function testUpdate(): void {
         $node = new NodeDo(null, 12, "node name", "node alias", "node nature");
         $dao = new NodeDao();
@@ -120,7 +120,7 @@ class AbstractDaoTest extends TestCase {
         $node2->setNature(null);
         $result = $dao->update($node2);
 
-        assertTrue($result);
+        assertEquals(1, $result);
     }
 
     #[LogAttribute(false)]
@@ -138,7 +138,7 @@ class AbstractDaoTest extends TestCase {
         $batch2[2]->setPublic(true);
 
         $result = $dao->updateBatch($batch2);
-        assertTrue($result);
+        assertEquals(3, $result);
     }
 
     #[LogAttribute(false)]

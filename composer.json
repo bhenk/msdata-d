@@ -12,8 +12,7 @@
   "require": {
     "php": ">=8.2",
     "ext-mysqli": "*",
-    "bhenk/logger": "^1.0",
-    "ext-openssl": "*"
+    "bhenk/logger": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^10.0"

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cd1836880d572c8704a242d6ecfbb3c3",
+    "content-hash": "b35e6d44619277d3a6c5e001a18c48fd",
     "packages": [
         {
             "name": "bhenk/logger",
@@ -1819,8 +1819,7 @@
     "prefer-lowest": false,
     "platform": {
         "php": ">=8.2",
-        "ext-mysqli": "*",
-        "ext-openssl": "*"
+        "ext-mysqli": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.3.0"

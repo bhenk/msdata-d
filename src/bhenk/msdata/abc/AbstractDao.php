@@ -16,10 +16,40 @@ use function mysqli_report;
 use function rtrim;
 use function str_repeat;
 
+/**
+ * Data Access Object with basic functionality
+ *
+ * In most cases subclasses only need to implement {@link AbstractDao::getDataObjectName() getDataObjectName} and
+ * {@link AbstractDao::getTableName() getTableName}. If
+ * {@link AbstractDao::getCreateTableStatement() getCreateTableStatement} is not sufficient
+ * override that method as well.
+ *
+ * This class expects {@link EntityInterface Entities} that subclass other Entity implementations to have
+ * parent-first in their :tech:`__construct()` and {@link EntityInterface::toArray() toArray()} functions, i.e.:
+ * ```
+ * class A extends Entity
+ *
+ * class B extends A
+ * ```
+ * In their :tech:`__construct()` and :tech:`toArray()` functions, properties/parameters have the order:
+ * ```
+ * ID, {props of A}, {props of B}
+ * ```
+ */
 abstract class AbstractDao {
 
+    /**
+     * Get the fully qualified classname of the {@link Entity} this class provides access to
+     *
+     * @return string fully qualified classname
+     */
     public abstract function getDataObjectName(): string;
 
+    /**
+     * Get the name of the table that will store the {@link Entity Entities} this class provides access to
+     *
+     * @return string name of table reserved for DO
+     */
     public abstract function getTableName(): string;
 
     /**
@@ -36,18 +66,20 @@ abstract class AbstractDao {
      *      PRIMARY KEY (`ID`)
      * );
      * ```
-     * In the above _%xyz%_ is placeholder for table name or property name.
+     * In the above :tech:`%xyz%` is placeholder for table name or property name. Notice that string type
+     * parameters have a limited length of 255 characters.
      *
-     * Subclasses may override.
+     * Subclasses may override. The table MUST have the same name as the one returned by the method
+     * {@link AbstractDao::getTableName() getTableName}.
      *
-     * @return string the ``CREATE TABLE`` sql
+     * @return string the :tech:`CREATE TABLE` sql
      * @throws ReflectionException
      */
     public function getCreateTableStatement(): string {
         $sql = /** @lang text */
             "CREATE TABLE IF NOT EXISTS `" . $this->getTableName() . "`\n(\n"
             . "\t`ID` \tINT NOT NULL AUTO_INCREMENT";
-        foreach ($this->getParents() as $parent) {
+        foreach ($this->getDoParents() as $parent) {
             foreach ($parent->getProperties() as $prop) {
                 $name = $prop->getName();
                 if ($name != "ID") {
@@ -60,6 +92,16 @@ abstract class AbstractDao {
         return $sql;
     }
 
+    /**
+     * Create a table in the database
+     *
+     * The statement used is the one from {@link AbstractDao::getCreateTableStatement() getCreateTableStatement}.
+     *
+     * @param bool $drop Drop (if exists) table with same name before create
+     * @return int count of executed statements
+     * @throws ReflectionException
+     * @throws Exception code 200
+     */
     public function createTable(bool $drop = false): int {
         $query = $drop ?
             /** @lang text */
@@ -80,23 +122,65 @@ abstract class AbstractDao {
         }
     }
 
+    /**
+     * Insert the given Entity
+     *
+     * The :tech:`ID` of the {@link Entity} (if any) will be ignored. Returns an Entity equal to the
+     * given Entity with the new :tech:`ID`.
+     *
+     * @param Entity $entity Entity to insert
+     * @return Entity new Entity, equal to given one, with new :tech:`ID`
+     * @throws Exception code 201
+     */
     public function insert(Entity $entity): Entity {
         return $this->insertBatch([$entity])[0];
     }
 
-    public function update(Entity $entity): bool {
+    /**
+     * Update the given Entity
+     *
+     * @param Entity $entity persisted Entity to update
+     * @return int rows affected: 1 for success, 0 for failure
+     * @throws Exception code 202
+     */
+    public function update(Entity $entity): int {
         return $this->updateBatch([$entity]);
     }
 
+    /**
+     * Delete the row with the given ID
+     *
+     * @param int $ID the :tech:`ID` to delete
+     * @return int rows affected: 1 for success, 0 if :tech:`ID` was not present
+     * @throws Exception code 203
+     */
     public function delete(int $ID): int {
         return $this->deleteBatch([$ID]);
     }
 
+    /**
+     * Fetch the Entity with the given ID
+     *
+     * @param int $ID the :tech:`ID` to fetch
+     * @return Entity|null Entity with given :tech:`ID` or *null* if not present
+     * @throws Exception code 204
+     */
     public function select(int $ID): ?Entity {
         $selected = $this->selectBatch([$ID]);
         return (count($selected) == 1) ? $selected[0] : null;
     }
 
+    /**
+     * Insert the Entities from the given array
+     *
+     * The :tech:`ID` of the {@link Entity Entities} (if any) will be ignored. Returns an array of
+     * Entities equal to the
+     * given Entities with new :tech:`ID`\ s.
+     *
+     * @param array $entity_array array of Entities to insert
+     * @return array array of Entities with new :tech:`ID`\ s
+     * @throws Exception code 201
+     */
     public function insertBatch(array $entity_array): array {
         $sql = $this->getPrepareInsertStatement();
         $new_entities = [];
@@ -130,7 +214,14 @@ abstract class AbstractDao {
         }
     }
 
-    public function updateBatch(array $entity_array): bool {
+    /**
+     * Update the Entities in the given array
+     *
+     * @param array $entity_array array of persisted Entities to update
+     * @return int rows affected
+     * @throws Exception code 202
+     */
+    public function updateBatch(array $entity_array): int {
         $sql = $this->getPrepareUpdateStatement();
         $stmt = null;
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -152,7 +243,7 @@ abstract class AbstractDao {
                 $row_count += $stmt->affected_rows;
             }
             Log::debug("UPDATE row count: " . $row_count);
-            return true;
+            return $row_count;
         } catch (Throwable $e) {
             throw new Exception("Could not update Entity", 202, $e);
         } finally {
@@ -160,6 +251,13 @@ abstract class AbstractDao {
         }
     }
 
+    /**
+     * Delete rows with the given IDs
+     *
+     * @param array $ids array with IDs of persisted entities
+     * @return int affected rows
+     * @throws Exception code 203
+     */
     public function deleteBatch(array $ids): int {
         $sql = $this->getPrepareDeleteStatement(count($ids));
         Log::debug($sql);
@@ -179,6 +277,17 @@ abstract class AbstractDao {
         }
     }
 
+    /**
+     * Delete Entity rows with a *where-clause*
+     *
+     * ```
+     * DELETE FROM %table_name% WHERE %expression%
+     * ```
+     *
+     * @param string $where_clause expression
+     * @return int rows affected
+     * @throws Exception code 203
+     */
     public function deleteWhere(string $where_clause): int {
         $sql = /** @lang text */
             "DELETE FROM `" . $this->getTableName() . "` WHERE " . $where_clause;
@@ -195,6 +304,13 @@ abstract class AbstractDao {
         }
     }
 
+    /**
+     * Select Entities with the given IDs
+     *
+     * @param array $ids array of IDs of persisted Entities
+     * @return array array of Entities or empty array if none found
+     * @throws Exception code 204
+     */
     public function selectBatch(array $ids): array {
         $sql = $this->getPrepareSelectStatement(count($ids));
         Log::debug($sql);
@@ -222,6 +338,16 @@ abstract class AbstractDao {
         }
     }
 
+    /**
+     * Select Entities with a *where-clause*
+     *
+     * ```
+     * SELECT FROM %table_name% WHERE %expression%
+     * ```
+     * @param string $where_clause expression
+     * @return array array of Entities or empty array if none found
+     * @throws Exception code 204
+     */
     public function selectWhere(string $where_clause): array {
         $sql = /** @lang text */
             "SELECT * FROM `" . $this->getTableName() . "` WHERE " . $where_clause;
@@ -250,7 +376,7 @@ abstract class AbstractDao {
         $s1 = /** @lang text */
             "INSERT INTO " . $this->getTableName() . " (";
         $s2 = ") VALUES (";
-        foreach ($this->getParents() as $parent) {
+        foreach ($this->getDoParents() as $parent) {
             foreach ($parent->getProperties() as $prop) {
                 $name = $prop->getName();
                 if ($name != "ID") {
@@ -270,7 +396,7 @@ abstract class AbstractDao {
             "UPDATE "
             . $this->getTableName()
             . " SET ";
-        foreach ($this->getParents() as $parent) {
+        foreach ($this->getDoParents() as $parent) {
             foreach ($parent->getProperties() as $prop) {
                 $name = $prop->getName();
                 if ($name != "ID") {
@@ -303,7 +429,7 @@ abstract class AbstractDao {
      * @return array
      * @throws ReflectionException
      */
-    public function getParents(): array {
+    private function getDoParents(): array {
         $parents = [];
         $rc = new ReflectionClass($this->getDataObjectName());
         do {
