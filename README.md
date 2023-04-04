@@ -1,6 +1,6 @@
 # msData-d
 
-Basic Data Object and Data Access Object implementations for MySql database
+**Basic Data Object and Data Access Object implementations for MySql database**
 
 * msData is written in PHP
 * Requirement: php >=8.1
