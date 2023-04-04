@@ -1,6 +1,6 @@
 # msData-d
 
-Basic Data Object and Data Access Object for MySql database
+Basic Data Object and Data Access Object implementations for MySql database
 
 msData is written in PHP \
 Requirement: php >=8.1 \
@@ -14,12 +14,12 @@ composer require bhenk/msdata
 
 ## Configuration
 
-See [MySqlConnector](https://bhenkmsdata.readthedocs.io/en/latest/api/bhenk/msdata/connector/MysqlConnector/MysqlConnector.html#mysqlconnector)
+See [MySqlConnector](https://bhenkmsdata.readthedocs.io/en/latest/api/bhenk/msdata/connector/MysqlConnector/MysqlConnector.html#mysqlconnector).
 
 ## Usage
-Extend the Data Object [Entity](https://bhenkmsdata.readthedocs.io/en/latest/api/bhenk/msdata/abc/Entity/Entity.html#entity) \
-Extend the Data Access Object [AbstractDao](https://bhenkmsdata.readthedocs.io/en/latest/api/bhenk/msdata/abc/AbstractDao/AbstractDao.html#abstractdao) \
-Run [AbstractDao::createTable](https://bhenkmsdata.readthedocs.io/en/latest/api/bhenk/msdata/abc/AbstractDao/AbstractDao.html#abstractdao-createtable) once.
+* Extend the Data Object [Entity](https://bhenkmsdata.readthedocs.io/en/latest/api/bhenk/msdata/abc/Entity/Entity.html#entity)
+* Extend the Data Access Object [AbstractDao](https://bhenkmsdata.readthedocs.io/en/latest/api/bhenk/msdata/abc/AbstractDao/AbstractDao.html#abstractdao)
+* Run [AbstractDao::createTable](https://bhenkmsdata.readthedocs.io/en/latest/api/bhenk/msdata/abc/AbstractDao/AbstractDao.html#abstractdao-createtable) once.
 
 ### Creation of tables
 Data types _string_, _int_, _bool_ and _float_, when used in Entities will
