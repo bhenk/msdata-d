@@ -6,7 +6,6 @@ use bhenk\logger\log\Log;
 use bhenk\msdata\connector\MysqlConnector;
 use Closure;
 use Exception;
-use PHPUnit\Framework\Constraint\Callback;
 use ReflectionClass;
 use ReflectionException;
 use Throwable;
@@ -42,11 +41,34 @@ use function str_repeat;
 abstract class AbstractDao {
 
     /**
-     * Get the fully qualified classname of the {@link Entity} this class provides access to
+     * Create a table in the database
      *
-     * @return string fully qualified classname
+     * The statement used is the one from {@link AbstractDao::getCreateTableStatement() getCreateTableStatement}.
+     *
+     * @param bool $drop Drop (if exists) table with same name before create
+     * @return int count of executed statements
+     * @throws ReflectionException
+     * @throws Exception code 200
      */
-    public abstract function getDataObjectName(): string;
+    public function createTable(bool $drop = false): int {
+        $query = $drop ?
+            /** @lang text */
+            "DROP TABLE IF EXISTS `"
+            . $this->getTableName()
+            . "`;" . PHP_EOL
+            : "";
+        $query .= $this->getCreateTableStatement();
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            $conn = MysqlConnector::get()->getConnector();
+            $result = $conn->multi_query($query);
+            $result += $conn->next_result();
+            Log::info("Executed statements: " . $result, [$query]);
+            return $result;
+        } catch (Throwable $e) {
+            throw new Exception("Could not create table " . $this->getTableName(), 200, $e);
+        }
+    }
 
     /**
      * Get the name of the table that will store the {@link Entity Entities} this class provides access to
@@ -96,34 +118,25 @@ abstract class AbstractDao {
     }
 
     /**
-     * Create a table in the database
-     *
-     * The statement used is the one from {@link AbstractDao::getCreateTableStatement() getCreateTableStatement}.
-     *
-     * @param bool $drop Drop (if exists) table with same name before create
-     * @return int count of executed statements
+     * @return array
      * @throws ReflectionException
-     * @throws Exception code 200
      */
-    public function createTable(bool $drop = false): int {
-        $query = $drop ?
-            /** @lang text */
-            "DROP TABLE IF EXISTS `"
-            . $this->getTableName()
-            . "`;" . PHP_EOL
-            : "";
-        $query .= $this->getCreateTableStatement();
-        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-        try {
-            $conn = MysqlConnector::get()->getConnector();
-            $result = $conn->multi_query($query);
-            $result += $conn->next_result();
-            Log::info("Executed statements: " . $result, [$query]);
-            return $result;
-        } catch (Throwable $e) {
-            throw new Exception("Could not create table " . $this->getTableName(), 200, $e);
-        }
+    private function getDoParents(): array {
+        $parents = [];
+        $rc = new ReflectionClass($this->getDataObjectName());
+        do {
+            $parents[] = $rc;
+            $rc = $rc->getParentClass();
+        } while ($rc);
+        return array_reverse($parents);
     }
+
+    /**
+     * Get the fully qualified classname of the {@link Entity} this class provides access to
+     *
+     * @return string fully qualified classname
+     */
+    public abstract function getDataObjectName(): string;
 
     /**
      * Insert the given Entity
@@ -138,40 +151,6 @@ abstract class AbstractDao {
     public function insert(Entity $entity): Entity {
         $inserted = $this->insertBatch([$entity]);
         return array_values($inserted)[0];
-    }
-
-    /**
-     * Update the given Entity
-     *
-     * @param Entity $entity persisted Entity to update
-     * @return int rows affected: 1 for success, 0 for failure
-     * @throws Exception code 202
-     */
-    public function update(Entity $entity): int {
-        return $this->updateBatch([$entity]);
-    }
-
-    /**
-     * Delete the row with the given ID
-     *
-     * @param int $ID the :tech:`ID` to delete
-     * @return int rows affected: 1 for success, 0 if :tech:`ID` was not present
-     * @throws Exception code 203
-     */
-    public function delete(int $ID): int {
-        return $this->deleteBatch([$ID]);
-    }
-
-    /**
-     * Fetch the Entity with the given ID
-     *
-     * @param int $ID the :tech:`ID` to fetch
-     * @return Entity|null Entity with given :tech:`ID` or *null* if not present
-     * @throws Exception code 204
-     */
-    public function select(int $ID): ?Entity {
-        $selected = $this->selectBatch([$ID]);
-        return (count($selected) == 1) ? array_values($selected)[0] : null;
     }
 
     /**
@@ -217,6 +196,36 @@ abstract class AbstractDao {
         }
     }
 
+    private function getPrepareInsertStatement(): string {
+        // INSERT INTO tbl_node (parent_id, name, alias, nature) VALUES (?, ?, ?, ?)
+        $s1 = /** @lang text */
+            "INSERT INTO " . $this->getTableName() . " (";
+        $s2 = ") VALUES (";
+        foreach ($this->getDoParents() as $parent) {
+            foreach ($parent->getProperties() as $prop) {
+                $name = $prop->getName();
+                if ($name != "ID") {
+                    $s1 .= $name . ", ";
+                    $s2 .= "?, ";
+                }
+            }
+        }
+        $statement = rtrim($s1, ", ") . rtrim($s2, ", ") . ")";
+        Log::debug("prepared insert statement: ", [$statement]);
+        return $statement;
+    }
+
+    /**
+     * Update the given Entity
+     *
+     * @param Entity $entity persisted Entity to update
+     * @return int rows affected: 1 for success, 0 for failure
+     * @throws Exception code 202
+     */
+    public function update(Entity $entity): int {
+        return $this->updateBatch([$entity]);
+    }
+
     /**
      * Update the Entities in the given array
      *
@@ -254,6 +263,36 @@ abstract class AbstractDao {
         }
     }
 
+    private function getPrepareUpdateStatement(): string {
+        // UPDATE tbl_name SET parent_id=?, name=?, alias=?, nature=?, public=? WHERE ID=?
+        $s1 = /** @lang text */
+            "UPDATE "
+            . $this->getTableName()
+            . " SET ";
+        foreach ($this->getDoParents() as $parent) {
+            foreach ($parent->getProperties() as $prop) {
+                $name = $prop->getName();
+                if ($name != "ID") {
+                    $s1 .= $prop->getName() . "=?, ";
+                }
+            }
+        }
+        $statement = rtrim($s1, ", ") . " WHERE ID=?";
+        Log::debug("prepared update statement: ", [$statement]);
+        return $statement;
+    }
+
+    /**
+     * Delete the row with the given ID
+     *
+     * @param int $ID the :tech:`ID` to delete
+     * @return int rows affected: 1 for success, 0 if :tech:`ID` was not present
+     * @throws Exception code 203
+     */
+    public function delete(int $ID): int {
+        return $this->deleteBatch([$ID]);
+    }
+
     /**
      * Delete rows with the given IDs
      *
@@ -280,31 +319,24 @@ abstract class AbstractDao {
         }
     }
 
-    /**
-     * Delete Entity rows with a *where-clause*
-     *
-     * ```
-     * DELETE FROM %table_name% WHERE %expression%
-     * ```
-     *
-     * @param string $where_clause expression
-     * @return int rows affected
-     * @throws Exception code 203
-     */
-    public function deleteWhere(string $where_clause): int {
+    private function getPrepareDeleteStatement(int $count): string {
+        // DELETE FROM `tbl_name` WHERE `ID`=?[ OR `ID`=?]...
         $sql = /** @lang text */
-            "DELETE FROM `" . $this->getTableName() . "` WHERE " . $where_clause;
-        Log::debug($sql);
-        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-        try {
-            $conn = MysqlConnector::get()->getConnector();
-            $conn->query($sql);
-            $row_count = $conn->affected_rows;
-            Log::debug("DELETE row count: " . $row_count);
-            return $row_count;
-        } catch (Throwable $e) {
-            throw new Exception("Could not delete Entity", 203, $e);
-        }
+            "DELETE FROM `" . $this->getTableName() . "` WHERE `ID`=?";
+        $sql .= str_repeat(" OR `ID`=?", $count - 1);
+        return $sql;
+    }
+
+    /**
+     * Fetch the Entity with the given ID
+     *
+     * @param int $ID the :tech:`ID` to fetch
+     * @return Entity|null Entity with given :tech:`ID` or *null* if not present
+     * @throws Exception code 204
+     */
+    public function select(int $ID): ?Entity {
+        $selected = $this->selectBatch([$ID]);
+        return (count($selected) == 1) ? array_values($selected)[0] : null;
     }
 
     /**
@@ -344,6 +376,41 @@ abstract class AbstractDao {
         }
     }
 
+    private function getPrepareSelectStatement(int $count): string {
+        // SELECT * FROM `table_name` WHERE `ID`=?[ OR `ID`=?]...
+        $sql = /** @lang text */
+            "SELECT * FROM `" . $this->getTableName() . "` WHERE `ID`=?";
+        $sql .= str_repeat(" OR `ID`=?", $count - 1);
+        return $sql;
+    }
+
+    /**
+     * Delete Entity rows with a *where-clause*
+     *
+     * ```
+     * DELETE FROM %table_name% WHERE %expression%
+     * ```
+     *
+     * @param string $where_clause expression
+     * @return int rows affected
+     * @throws Exception code 203
+     */
+    public function deleteWhere(string $where_clause): int {
+        $sql = /** @lang text */
+            "DELETE FROM `" . $this->getTableName() . "` WHERE " . $where_clause;
+        Log::debug($sql);
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            $conn = MysqlConnector::get()->getConnector();
+            $conn->query($sql);
+            $row_count = $conn->affected_rows;
+            Log::debug("DELETE row count: " . $row_count);
+            return $row_count;
+        } catch (Throwable $e) {
+            throw new Exception("Could not delete Entity", 203, $e);
+        }
+    }
+
     /**
      * Select Entities with a *where-clause*
      *
@@ -366,8 +433,8 @@ abstract class AbstractDao {
      */
     public function selectWhere(string $where_clause, Closure $func = null): array {
         if (is_null($func)) {
-            $func = function(Entity $entity): int {
-                return  $entity->getID();
+            $func = function (Entity $entity): int {
+                return $entity->getID();
             };
         }
         $sql = /** @lang text */
@@ -391,74 +458,6 @@ abstract class AbstractDao {
         } catch (Throwable $e) {
             throw new Exception("Could not select Entity", 204, $e);
         }
-    }
-
-    private function getPrepareInsertStatement(): string {
-        // INSERT INTO tbl_node (parent_id, name, alias, nature) VALUES (?, ?, ?, ?)
-        $s1 = /** @lang text */
-            "INSERT INTO " . $this->getTableName() . " (";
-        $s2 = ") VALUES (";
-        foreach ($this->getDoParents() as $parent) {
-            foreach ($parent->getProperties() as $prop) {
-                $name = $prop->getName();
-                if ($name != "ID") {
-                    $s1 .= $name . ", ";
-                    $s2 .= "?, ";
-                }
-            }
-        }
-        $statement = rtrim($s1, ", ") . rtrim($s2, ", ") . ")";
-        Log::debug("prepared insert statement: ", [$statement]);
-        return $statement;
-    }
-
-    private function getPrepareUpdateStatement(): string {
-        // UPDATE tbl_name SET parent_id=?, name=?, alias=?, nature=?, public=? WHERE ID=?
-        $s1 = /** @lang text */
-            "UPDATE "
-            . $this->getTableName()
-            . " SET ";
-        foreach ($this->getDoParents() as $parent) {
-            foreach ($parent->getProperties() as $prop) {
-                $name = $prop->getName();
-                if ($name != "ID") {
-                    $s1 .= $prop->getName() . "=?, ";
-                }
-            }
-        }
-        $statement = rtrim($s1, ", ") . " WHERE ID=?";
-        Log::debug("prepared update statement: ", [$statement]);
-        return $statement;
-    }
-
-    private function getPrepareDeleteStatement(int $count): string {
-        // DELETE FROM `tbl_name` WHERE `ID`=?[ OR `ID`=?]...
-        $sql = /** @lang text */
-            "DELETE FROM `" . $this->getTableName() . "` WHERE `ID`=?";
-        $sql .= str_repeat(" OR `ID`=?", $count - 1);
-        return $sql;
-    }
-
-    private function getPrepareSelectStatement(int $count): string {
-        // SELECT * FROM `table_name` WHERE `ID`=?[ OR `ID`=?]...
-        $sql = /** @lang text */
-            "SELECT * FROM `" . $this->getTableName() . "` WHERE `ID`=?";
-        $sql .= str_repeat(" OR `ID`=?", $count - 1);
-        return $sql;
-    }
-
-    /**
-     * @return array
-     * @throws ReflectionException
-     */
-    private function getDoParents(): array {
-        $parents = [];
-        $rc = new ReflectionClass($this->getDataObjectName());
-        do {
-            $parents[] = $rc;
-            $rc = $rc->getParentClass();
-        } while ($rc);
-        return array_reverse($parents);
     }
 
 }

@@ -93,29 +93,38 @@ Methods
 +++++++
 
 
-.. _bhenk\msdata\abc\AbstractDao::getDataObjectName:
+.. _bhenk\msdata\abc\AbstractDao::createTable:
 
-AbstractDao::getDataObjectName
-------------------------------
+AbstractDao::createTable
+------------------------
 
 .. table::
    :widths: auto
    :align: left
 
-   ========== ================= 
-   predicates public | abstract 
-   ========== ================= 
+   ========== ====== 
+   predicates public 
+   ========== ====== 
 
 
-**Get the fully qualified classname of the** :ref:`bhenk\msdata\abc\Entity` **this class provides access to**
+**Create a table in the database**
+
+
+The statement used is the one from :ref:`getCreateTableStatement <bhenk\msdata\abc\AbstractDao::getCreateTableStatement>`.
+
 
 
 .. code-block:: php
 
-   public abstract function getDataObjectName(): string
+   public function createTable(
+         Parameter #0 [ <optional> bool $drop = false ]
+    ): int
 
 
-| :tag6:`return` string  - fully qualified classname
+| :tag6:`param` bool :param:`$drop` - Drop (if exists) table with same name before create
+| :tag6:`return` int  - count of executed statements
+| :tag6:`throws` `ReflectionException <https://www.php.net/manual/en/class.reflectionexception.php>`_
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 200
 
 
 ----
@@ -201,38 +210,29 @@ Subclasses may override. The table MUST have the same name as the one returned b
 ----
 
 
-.. _bhenk\msdata\abc\AbstractDao::createTable:
+.. _bhenk\msdata\abc\AbstractDao::getDataObjectName:
 
-AbstractDao::createTable
-------------------------
+AbstractDao::getDataObjectName
+------------------------------
 
 .. table::
    :widths: auto
    :align: left
 
-   ========== ====== 
-   predicates public 
-   ========== ====== 
+   ========== ================= 
+   predicates public | abstract 
+   ========== ================= 
 
 
-**Create a table in the database**
-
-
-The statement used is the one from :ref:`getCreateTableStatement <bhenk\msdata\abc\AbstractDao::getCreateTableStatement>`.
-
+**Get the fully qualified classname of the** :ref:`bhenk\msdata\abc\Entity` **this class provides access to**
 
 
 .. code-block:: php
 
-   public function createTable(
-         Parameter #0 [ <optional> bool $drop = false ]
-    ): int
+   public abstract function getDataObjectName(): string
 
 
-| :tag6:`param` bool :param:`$drop` - Drop (if exists) table with same name before create
-| :tag6:`return` int  - count of executed statements
-| :tag6:`throws` `ReflectionException <https://www.php.net/manual/en/class.reflectionexception.php>`_
-| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 200
+| :tag6:`return` string  - fully qualified classname
 
 
 ----
@@ -270,102 +270,6 @@ given Entity with the new :tech:`ID`.
 | :tag6:`param` :ref:`bhenk\msdata\abc\Entity` :param:`$entity` - Entity to insert
 | :tag6:`return` :ref:`bhenk\msdata\abc\Entity`  - new Entity, equal to given one, with new :tech:`ID`
 | :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 201
-
-
-----
-
-
-.. _bhenk\msdata\abc\AbstractDao::update:
-
-AbstractDao::update
--------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-**Update the given Entity**
-
-
-.. code-block:: php
-
-   public function update(
-         Parameter #0 [ <required> bhenk\msdata\abc\Entity $entity ]
-    ): int
-
-
-| :tag6:`param` :ref:`bhenk\msdata\abc\Entity` :param:`$entity` - persisted Entity to update
-| :tag6:`return` int  - rows affected: 1 for success, 0 for failure
-| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 202
-
-
-----
-
-
-.. _bhenk\msdata\abc\AbstractDao::delete:
-
-AbstractDao::delete
--------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-**Delete the row with the given ID**
-
-
-.. code-block:: php
-
-   public function delete(
-         Parameter #0 [ <required> int $ID ]
-    ): int
-
-
-| :tag6:`param` int :param:`$ID` - the :tech:`ID` to delete
-| :tag6:`return` int  - rows affected: 1 for success, 0 if :tech:`ID` was not present
-| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 203
-
-
-----
-
-
-.. _bhenk\msdata\abc\AbstractDao::select:
-
-AbstractDao::select
--------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-**Fetch the Entity with the given ID**
-
-
-.. code-block:: php
-
-   public function select(
-         Parameter #0 [ <required> int $ID ]
-    ): ?Entity
-
-
-| :tag6:`param` int :param:`$ID` - the :tech:`ID` to fetch
-| :tag6:`return` ?\ :ref:`bhenk\msdata\abc\Entity`  - Entity with given :tech:`ID` or *null* if not present
-| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 204
 
 
 ----
@@ -409,6 +313,38 @@ given Entities with new :tech:`ID`\ s and ID as array key.
 ----
 
 
+.. _bhenk\msdata\abc\AbstractDao::update:
+
+AbstractDao::update
+-------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ========== ====== 
+   predicates public 
+   ========== ====== 
+
+
+**Update the given Entity**
+
+
+.. code-block:: php
+
+   public function update(
+         Parameter #0 [ <required> bhenk\msdata\abc\Entity $entity ]
+    ): int
+
+
+| :tag6:`param` :ref:`bhenk\msdata\abc\Entity` :param:`$entity` - persisted Entity to update
+| :tag6:`return` int  - rows affected: 1 for success, 0 for failure
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 202
+
+
+----
+
+
 .. _bhenk\msdata\abc\AbstractDao::updateBatch:
 
 AbstractDao::updateBatch
@@ -441,6 +377,38 @@ AbstractDao::updateBatch
 ----
 
 
+.. _bhenk\msdata\abc\AbstractDao::delete:
+
+AbstractDao::delete
+-------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ========== ====== 
+   predicates public 
+   ========== ====== 
+
+
+**Delete the row with the given ID**
+
+
+.. code-block:: php
+
+   public function delete(
+         Parameter #0 [ <required> int $ID ]
+    ): int
+
+
+| :tag6:`param` int :param:`$ID` - the :tech:`ID` to delete
+| :tag6:`return` int  - rows affected: 1 for success, 0 if :tech:`ID` was not present
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 203
+
+
+----
+
+
 .. _bhenk\msdata\abc\AbstractDao::deleteBatch:
 
 AbstractDao::deleteBatch
@@ -468,6 +436,74 @@ AbstractDao::deleteBatch
 | :tag6:`param` array :param:`$ids` - array with IDs of persisted entities
 | :tag6:`return` int  - affected rows
 | :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 203
+
+
+----
+
+
+.. _bhenk\msdata\abc\AbstractDao::select:
+
+AbstractDao::select
+-------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ========== ====== 
+   predicates public 
+   ========== ====== 
+
+
+**Fetch the Entity with the given ID**
+
+
+.. code-block:: php
+
+   public function select(
+         Parameter #0 [ <required> int $ID ]
+    ): ?Entity
+
+
+| :tag6:`param` int :param:`$ID` - the :tech:`ID` to fetch
+| :tag6:`return` ?\ :ref:`bhenk\msdata\abc\Entity`  - Entity with given :tech:`ID` or *null* if not present
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 204
+
+
+----
+
+
+.. _bhenk\msdata\abc\AbstractDao::selectBatch:
+
+AbstractDao::selectBatch
+------------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ========== ====== 
+   predicates public 
+   ========== ====== 
+
+
+**Select Entities with the given IDs**
+
+
+The returned Entity[] array has Entity IDs as keys.
+
+
+
+.. code-block:: php
+
+   public function selectBatch(
+         Parameter #0 [ <required> array $ids ]
+    ): array
+
+
+| :tag6:`param` array :param:`$ids` - array of IDs of persisted Entities
+| :tag6:`return` array  - array of Entities or empty array if none found
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 204
 
 
 ----
@@ -509,42 +545,6 @@ AbstractDao::deleteWhere
 | :tag6:`param` string :param:`$where_clause` - expression
 | :tag6:`return` int  - rows affected
 | :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 203
-
-
-----
-
-
-.. _bhenk\msdata\abc\AbstractDao::selectBatch:
-
-AbstractDao::selectBatch
-------------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-**Select Entities with the given IDs**
-
-
-The returned Entity[] array has Entity IDs as keys.
-
-
-
-.. code-block:: php
-
-   public function selectBatch(
-         Parameter #0 [ <required> array $ids ]
-    ): array
-
-
-| :tag6:`param` array :param:`$ids` - array of IDs of persisted Entities
-| :tag6:`return` array  - array of Entities or empty array if none found
-| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 204
 
 
 ----
@@ -603,4 +603,4 @@ Default: the returned Entity[] array has Entity IDs as keys.
 
 ----
 
-:block:`Sat, 08 Apr 2023 17:52:22 +0000` 
+:block:`Sat, 08 Apr 2023 17:57:52 +0000` 

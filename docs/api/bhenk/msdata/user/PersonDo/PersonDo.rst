@@ -414,9 +414,9 @@ PersonDo::setEmail
 ----
 
 
-.. _bhenk\msdata\user\PersonDo::getID:
+.. _bhenk\msdata\user\PersonDo::clone:
 
-PersonDo::getID
+PersonDo::clone
 ---------------
 
 .. table::
@@ -425,8 +425,8 @@ PersonDo::getID
 
    ============== ============================================== 
    predicates     public                                         
-   implements     :ref:`bhenk\msdata\abc\EntityInterface::getID` 
-   inherited from :ref:`bhenk\msdata\abc\Entity::getID`          
+   implements     :ref:`bhenk\msdata\abc\EntityInterface::clone` 
+   inherited from :ref:`bhenk\msdata\abc\Entity::clone`          
    ============== ============================================== 
 
 
@@ -438,21 +438,125 @@ PersonDo::getID
 
     
 
-   **Get the ID of this Entity or** *null* **if it has no ID**
+   **Create an Entity that equals this Entity**
    
-   | :tag6:`return` int | null  - ID of this Entity or *null*
    
-   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::getID`
+   The newly created Entity gets the given ID or no ID if :tagsign:`param` :tech:`$ID` is *null*.
+   
+   | :tag6:`param` int | null :param:`$ID`
+   | :tag6:`return` `Entity <https://www.google.com/search?q=Entity>`_
+   
+   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::clone`
 
 
 
 
 .. code-block:: php
 
-   public function getID(): ?int
+   public function clone(
+         Parameter #0 [ <optional> ?int $ID = NULL ]
+    ): Entity
 
 
-| :tag6:`return` ?\ int
+| :tag6:`param` ?\ int :param:`$ID`
+| :tag6:`return` :ref:`bhenk\msdata\abc\Entity`  - Entity, similar to this one, with the given ID
+| :tag6:`throws` `ReflectionException <https://www.php.net/manual/en/class.reflectionexception.php>`_
+
+
+----
+
+
+.. _bhenk\msdata\user\PersonDo::toArray:
+
+PersonDo::toArray
+-----------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ============== ================================================ 
+   predicates     public                                           
+   implements     :ref:`bhenk\msdata\abc\EntityInterface::toArray` 
+   inherited from :ref:`bhenk\msdata\abc\Entity::toArray`          
+   ============== ================================================ 
+
+
+
+
+
+
+.. admonition:: @inheritdoc
+
+    
+
+   **Express the properties of this Entity in an array**
+   
+   
+   The returned array should be in such order that it can be fet to the static method
+   `EntityInterface::fromArray() <https://www.google.com/search?q=EntityInterface::fromArray()>`_.
+   
+   | :tag6:`return` array  - array with properties of this Entity
+   
+   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::toArray`
+
+
+
+
+
+.. admonition::  see also
+
+    `Entity::fromArray() <https://www.google.com/search?q=Entity::fromArray()>`_
+
+
+.. code-block:: php
+
+   public function toArray(): array
+
+
+| :tag6:`return` array  - array with properties
+
+
+----
+
+
+.. _bhenk\msdata\user\PersonDo::getParents:
+
+PersonDo::getParents
+--------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ============== ========================================== 
+   predicates     public                                     
+   inherited from :ref:`bhenk\msdata\abc\Entity::getParents` 
+   ============== ========================================== 
+
+
+**Get the (Reflection) parents of this Entity in reverse order**
+
+
+
+..  code-block::
+
+   class A extends Entity
+   
+   class B extends A
+   
+   returned array = [Entity-Reflection, A-Reflection, B-Reflection]
+
+
+
+
+
+.. code-block:: php
+
+   public function getParents(): array
+
+
+| :tag6:`return` array  - array with `ReflectionClass <https://www.php.net/manual/en/class.reflectionclass.php>`_ parents and this Entity
 
 
 ----
@@ -530,20 +634,20 @@ properties/parameters have the order:
 ----
 
 
-.. _bhenk\msdata\user\PersonDo::toArray:
+.. _bhenk\msdata\user\PersonDo::isSame:
 
-PersonDo::toArray
------------------
+PersonDo::isSame
+----------------
 
 .. table::
    :widths: auto
    :align: left
 
-   ============== ================================================ 
-   predicates     public                                           
-   implements     :ref:`bhenk\msdata\abc\EntityInterface::toArray` 
-   inherited from :ref:`bhenk\msdata\abc\Entity::toArray`          
-   ============== ================================================ 
+   ============== =============================================== 
+   predicates     public                                          
+   implements     :ref:`bhenk\msdata\abc\EntityInterface::isSame` 
+   inherited from :ref:`bhenk\msdata\abc\Entity::isSame`          
+   ============== =============================================== 
 
 
 
@@ -554,83 +658,28 @@ PersonDo::toArray
 
     
 
-   **Express the properties of this Entity in an array**
+   **Test is same function**
    
    
-   The returned array should be in such order that it can be fet to the static method
-   `EntityInterface::fromArray() <https://www.google.com/search?q=EntityInterface::fromArray()>`_.
+   The given Entity is similar to this Entity if all properties, including :tech:`ID`, are equal.
    
-   | :tag6:`return` array  - array with properties of this Entity
+   | :tag6:`param` `Entity <https://www.google.com/search?q=Entity>`_ :param:`$other` - Entity to test
+   | :tag6:`return` bool  - *true* if all properties, including :tech:`ID`, are equal, *false* otherwise
    
-   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::toArray`
-
-
-
-
-
-.. admonition::  see also
-
-    `Entity::fromArray() <https://www.google.com/search?q=Entity::fromArray()>`_
-
-
-.. code-block:: php
-
-   public function toArray(): array
-
-
-| :tag6:`return` array  - array with properties
-
-
-----
-
-
-.. _bhenk\msdata\user\PersonDo::clone:
-
-PersonDo::clone
----------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ============== ============================================== 
-   predicates     public                                         
-   implements     :ref:`bhenk\msdata\abc\EntityInterface::clone` 
-   inherited from :ref:`bhenk\msdata\abc\Entity::clone`          
-   ============== ============================================== 
-
-
-
-
-
-
-.. admonition:: @inheritdoc
-
-    
-
-   **Create an Entity that equals this Entity**
-   
-   
-   The newly created Entity gets the given ID or no ID if :tagsign:`param` :tech:`$ID` is *null*.
-   
-   | :tag6:`param` int | null :param:`$ID`
-   | :tag6:`return` `Entity <https://www.google.com/search?q=Entity>`_
-   
-   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::clone`
+   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::isSame`
 
 
 
 
 .. code-block:: php
 
-   public function clone(
-         Parameter #0 [ <optional> ?int $ID = NULL ]
-    ): Entity
+   public function isSame(
+         Parameter #0 [ <required> bhenk\msdata\abc\Entity $other ]
+    ): bool
 
 
-| :tag6:`param` ?\ int :param:`$ID`
-| :tag6:`return` :ref:`bhenk\msdata\abc\Entity`  - Entity, similar to this one, with the given ID
-| :tag6:`throws` `ReflectionException <https://www.php.net/manual/en/class.reflectionexception.php>`_
+| :tag6:`param` :ref:`bhenk\msdata\abc\Entity` :param:`$other`
+| :tag6:`return` bool
 
 
 ----
@@ -687,20 +736,20 @@ PersonDo::equals
 ----
 
 
-.. _bhenk\msdata\user\PersonDo::isSame:
+.. _bhenk\msdata\user\PersonDo::getID:
 
-PersonDo::isSame
-----------------
+PersonDo::getID
+---------------
 
 .. table::
    :widths: auto
    :align: left
 
-   ============== =============================================== 
-   predicates     public                                          
-   implements     :ref:`bhenk\msdata\abc\EntityInterface::isSame` 
-   inherited from :ref:`bhenk\msdata\abc\Entity::isSame`          
-   ============== =============================================== 
+   ============== ============================================== 
+   predicates     public                                         
+   implements     :ref:`bhenk\msdata\abc\EntityInterface::getID` 
+   inherited from :ref:`bhenk\msdata\abc\Entity::getID`          
+   ============== ============================================== 
 
 
 
@@ -711,28 +760,21 @@ PersonDo::isSame
 
     
 
-   **Test is same function**
+   **Get the ID of this Entity or** *null* **if it has no ID**
    
+   | :tag6:`return` int | null  - ID of this Entity or *null*
    
-   The given Entity is similar to this Entity if all properties, including :tech:`ID`, are equal.
-   
-   | :tag6:`param` `Entity <https://www.google.com/search?q=Entity>`_ :param:`$other` - Entity to test
-   | :tag6:`return` bool  - *true* if all properties, including :tech:`ID`, are equal, *false* otherwise
-   
-   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::isSame`
+   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::getID`
 
 
 
 
 .. code-block:: php
 
-   public function isSame(
-         Parameter #0 [ <required> bhenk\msdata\abc\Entity $other ]
-    ): bool
+   public function getID(): ?int
 
 
-| :tag6:`param` :ref:`bhenk\msdata\abc\Entity` :param:`$other`
-| :tag6:`return` bool
+| :tag6:`return` ?\ int
 
 
 ----
@@ -767,46 +809,4 @@ PersonDo::__toString
 
 ----
 
-
-.. _bhenk\msdata\user\PersonDo::getParents:
-
-PersonDo::getParents
---------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ============== ========================================== 
-   predicates     public                                     
-   inherited from :ref:`bhenk\msdata\abc\Entity::getParents` 
-   ============== ========================================== 
-
-
-**Get the (Reflection) parents of this Entity in reverse order**
-
-
-
-..  code-block::
-
-   class A extends Entity
-   
-   class B extends A
-   
-   returned array = [Entity-Reflection, A-Reflection, B-Reflection]
-
-
-
-
-
-.. code-block:: php
-
-   public function getParents(): array
-
-
-| :tag6:`return` array  - array with `ReflectionClass <https://www.php.net/manual/en/class.reflectionclass.php>`_ parents and this Entity
-
-
-----
-
-:block:`Sat, 08 Apr 2023 17:52:22 +0000` 
+:block:`Sat, 08 Apr 2023 17:57:52 +0000` 

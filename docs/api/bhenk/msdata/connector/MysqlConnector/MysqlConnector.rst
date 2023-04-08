@@ -288,6 +288,35 @@ When not using auto-find of configuration, this method must be called before a c
 ----
 
 
+.. _bhenk\msdata\connector\MysqlConnector::getConnector:
+
+MysqlConnector::getConnector
+----------------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ========== ====== 
+   predicates public 
+   ========== ====== 
+
+
+**Get the connector**
+
+
+.. code-block:: php
+
+   public function getConnector(): mysqli
+
+
+| :tag6:`return` `mysqli <https://www.php.net/manual/en/class.mysqli.php>`_  - connector to database
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - if connection could not be established, code 100
+
+
+----
+
+
 .. _bhenk\msdata\connector\MysqlConnector::getConfiguration:
 
 MysqlConnector::getConfiguration
@@ -368,33 +397,4 @@ MysqlConnector::setConfiguration
 
 ----
 
-
-.. _bhenk\msdata\connector\MysqlConnector::getConnector:
-
-MysqlConnector::getConnector
-----------------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-**Get the connector**
-
-
-.. code-block:: php
-
-   public function getConnector(): mysqli
-
-
-| :tag6:`return` `mysqli <https://www.php.net/manual/en/class.mysqli.php>`_  - connector to database
-| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - if connection could not be established, code 100
-
-
-----
-
-:block:`Sat, 08 Apr 2023 17:52:22 +0000` 
+:block:`Sat, 08 Apr 2023 17:57:52 +0000` 

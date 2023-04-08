@@ -106,9 +106,9 @@ Methods
 +++++++
 
 
-.. _bhenk\msdata\abc\Entity::getID:
+.. _bhenk\msdata\abc\Entity::clone:
 
-Entity::getID
+Entity::clone
 -------------
 
 .. table::
@@ -117,7 +117,7 @@ Entity::getID
 
    ========== ============================================== 
    predicates public                                         
-   implements :ref:`bhenk\msdata\abc\EntityInterface::getID` 
+   implements :ref:`bhenk\msdata\abc\EntityInterface::clone` 
    ========== ============================================== 
 
 
@@ -129,21 +129,123 @@ Entity::getID
 
     
 
-   **Get the ID of this Entity or** *null* **if it has no ID**
+   **Create an Entity that equals this Entity**
    
-   | :tag6:`return` int | null  - ID of this Entity or *null*
    
-   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::getID`
+   The newly created Entity gets the given ID or no ID if :tagsign:`param` :tech:`$ID` is *null*.
+   
+   | :tag6:`param` int | null :param:`$ID`
+   | :tag6:`return` :ref:`bhenk\msdata\abc\Entity`
+   
+   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::clone`
 
 
 
 
 .. code-block:: php
 
-   public function getID(): ?int
+   public function clone(
+         Parameter #0 [ <optional> ?int $ID = NULL ]
+    ): Entity
 
 
-| :tag6:`return` ?\ int
+| :tag6:`param` ?\ int :param:`$ID`
+| :tag6:`return` :ref:`bhenk\msdata\abc\Entity`  - Entity, similar to this one, with the given ID
+| :tag6:`throws` `ReflectionException <https://www.php.net/manual/en/class.reflectionexception.php>`_
+
+
+----
+
+
+.. _bhenk\msdata\abc\Entity::toArray:
+
+Entity::toArray
+---------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ========== ================================================ 
+   predicates public                                           
+   implements :ref:`bhenk\msdata\abc\EntityInterface::toArray` 
+   ========== ================================================ 
+
+
+
+
+
+
+.. admonition:: @inheritdoc
+
+    
+
+   **Express the properties of this Entity in an array**
+   
+   
+   The returned array should be in such order that it can be fet to the static method
+   :ref:`bhenk\msdata\abc\EntityInterface::fromArray`.
+   
+   | :tag6:`return` array  - array with properties of this Entity
+   
+   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::toArray`
+
+
+
+
+
+.. admonition::  see also
+
+    :ref:`bhenk\msdata\abc\Entity::fromArray`
+
+
+.. code-block:: php
+
+   public function toArray(): array
+
+
+| :tag6:`return` array  - array with properties
+
+
+----
+
+
+.. _bhenk\msdata\abc\Entity::getParents:
+
+Entity::getParents
+------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ========== ====== 
+   predicates public 
+   ========== ====== 
+
+
+**Get the (Reflection) parents of this Entity in reverse order**
+
+
+
+..  code-block::
+
+   class A extends Entity
+   
+   class B extends A
+   
+   returned array = [Entity-Reflection, A-Reflection, B-Reflection]
+
+
+
+
+
+.. code-block:: php
+
+   public function getParents(): array
+
+
+| :tag6:`return` array  - array with `ReflectionClass <https://www.php.net/manual/en/class.reflectionclass.php>`_ parents and this Entity
 
 
 ----
@@ -220,19 +322,19 @@ properties/parameters have the order:
 ----
 
 
-.. _bhenk\msdata\abc\Entity::toArray:
+.. _bhenk\msdata\abc\Entity::isSame:
 
-Entity::toArray
----------------
+Entity::isSame
+--------------
 
 .. table::
    :widths: auto
    :align: left
 
-   ========== ================================================ 
-   predicates public                                           
-   implements :ref:`bhenk\msdata\abc\EntityInterface::toArray` 
-   ========== ================================================ 
+   ========== =============================================== 
+   predicates public                                          
+   implements :ref:`bhenk\msdata\abc\EntityInterface::isSame` 
+   ========== =============================================== 
 
 
 
@@ -243,82 +345,28 @@ Entity::toArray
 
     
 
-   **Express the properties of this Entity in an array**
+   **Test is same function**
    
    
-   The returned array should be in such order that it can be fet to the static method
-   :ref:`bhenk\msdata\abc\EntityInterface::fromArray`.
+   The given Entity is similar to this Entity if all properties, including :tech:`ID`, are equal.
    
-   | :tag6:`return` array  - array with properties of this Entity
+   | :tag6:`param` :ref:`bhenk\msdata\abc\Entity` :param:`$other` - Entity to test
+   | :tag6:`return` bool  - *true* if all properties, including :tech:`ID`, are equal, *false* otherwise
    
-   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::toArray`
-
-
-
-
-
-.. admonition::  see also
-
-    :ref:`bhenk\msdata\abc\Entity::fromArray`
-
-
-.. code-block:: php
-
-   public function toArray(): array
-
-
-| :tag6:`return` array  - array with properties
-
-
-----
-
-
-.. _bhenk\msdata\abc\Entity::clone:
-
-Entity::clone
--------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ============================================== 
-   predicates public                                         
-   implements :ref:`bhenk\msdata\abc\EntityInterface::clone` 
-   ========== ============================================== 
-
-
-
-
-
-
-.. admonition:: @inheritdoc
-
-    
-
-   **Create an Entity that equals this Entity**
-   
-   
-   The newly created Entity gets the given ID or no ID if :tagsign:`param` :tech:`$ID` is *null*.
-   
-   | :tag6:`param` int | null :param:`$ID`
-   | :tag6:`return` :ref:`bhenk\msdata\abc\Entity`
-   
-   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::clone`
+   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::isSame`
 
 
 
 
 .. code-block:: php
 
-   public function clone(
-         Parameter #0 [ <optional> ?int $ID = NULL ]
-    ): Entity
+   public function isSame(
+         Parameter #0 [ <required> bhenk\msdata\abc\Entity $other ]
+    ): bool
 
 
-| :tag6:`param` ?\ int :param:`$ID`
-| :tag6:`return` :ref:`bhenk\msdata\abc\Entity`  - Entity, similar to this one, with the given ID
-| :tag6:`throws` `ReflectionException <https://www.php.net/manual/en/class.reflectionexception.php>`_
+| :tag6:`param` :ref:`bhenk\msdata\abc\Entity` :param:`$other`
+| :tag6:`return` bool
 
 
 ----
@@ -374,19 +422,19 @@ Entity::equals
 ----
 
 
-.. _bhenk\msdata\abc\Entity::isSame:
+.. _bhenk\msdata\abc\Entity::getID:
 
-Entity::isSame
---------------
+Entity::getID
+-------------
 
 .. table::
    :widths: auto
    :align: left
 
-   ========== =============================================== 
-   predicates public                                          
-   implements :ref:`bhenk\msdata\abc\EntityInterface::isSame` 
-   ========== =============================================== 
+   ========== ============================================== 
+   predicates public                                         
+   implements :ref:`bhenk\msdata\abc\EntityInterface::getID` 
+   ========== ============================================== 
 
 
 
@@ -397,28 +445,21 @@ Entity::isSame
 
     
 
-   **Test is same function**
+   **Get the ID of this Entity or** *null* **if it has no ID**
    
+   | :tag6:`return` int | null  - ID of this Entity or *null*
    
-   The given Entity is similar to this Entity if all properties, including :tech:`ID`, are equal.
-   
-   | :tag6:`param` :ref:`bhenk\msdata\abc\Entity` :param:`$other` - Entity to test
-   | :tag6:`return` bool  - *true* if all properties, including :tech:`ID`, are equal, *false* otherwise
-   
-   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::isSame`
+   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\EntityInterface::getID`
 
 
 
 
 .. code-block:: php
 
-   public function isSame(
-         Parameter #0 [ <required> bhenk\msdata\abc\Entity $other ]
-    ): bool
+   public function getID(): ?int
 
 
-| :tag6:`param` :ref:`bhenk\msdata\abc\Entity` :param:`$other`
-| :tag6:`return` bool
+| :tag6:`return` ?\ int
 
 
 ----
@@ -452,45 +493,4 @@ Entity::__toString
 
 ----
 
-
-.. _bhenk\msdata\abc\Entity::getParents:
-
-Entity::getParents
-------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-**Get the (Reflection) parents of this Entity in reverse order**
-
-
-
-..  code-block::
-
-   class A extends Entity
-   
-   class B extends A
-   
-   returned array = [Entity-Reflection, A-Reflection, B-Reflection]
-
-
-
-
-
-.. code-block:: php
-
-   public function getParents(): array
-
-
-| :tag6:`return` array  - array with `ReflectionClass <https://www.php.net/manual/en/class.reflectionclass.php>`_ parents and this Entity
-
-
-----
-
-:block:`Sat, 08 Apr 2023 17:52:22 +0000` 
+:block:`Sat, 08 Apr 2023 17:57:52 +0000` 

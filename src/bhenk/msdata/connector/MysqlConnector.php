@@ -110,6 +110,32 @@ class MysqlConnector {
     }
 
     /**
+     * Get the connector
+     *
+     * @return mysqli connector to database
+     * @throws Exception if connection could not be established, code 100
+     */
+    public function getConnector(): mysqli {
+        if (!isset($this->mysqli) or empty($this->configuration)) {
+            $config = $this->getConfiguration();
+            $persistent = $config["persistent"] ?? true;
+            $hostname = $persistent ? "p:" . $config["hostname"] : $config["hostname"];
+            $port = $config["port"] ?? 3306;
+            try {
+                $this->mysqli = new mysqli($hostname, $config["username"],
+                    $config["password"], $config["database"], $port);
+                Log::info("Created connection to mysql database '" . $config["database"] . "'");
+            } catch (Exception $e) {
+                $msg = "Could not create connection to mysql database '"
+                    . $config["database"] . "'";
+                Log::alert($msg, [$e]);
+                throw new Exception($msg, 100, $e);
+            }
+        }
+        return $this->mysqli;
+    }
+
+    /**
      * Get the configuration
      *
      * If configuration not set, the array will be read from the configuration file, either from the configuration
@@ -146,32 +172,6 @@ class MysqlConnector {
     public function setConfiguration(array $configuration): void {
         $this->validateConfiguration($configuration);
         $this->configuration = $configuration;
-    }
-
-    /**
-     * Get the connector
-     *
-     * @return mysqli connector to database
-     * @throws Exception if connection could not be established, code 100
-     */
-    public function getConnector(): mysqli {
-        if (!isset($this->mysqli) or empty($this->configuration)) {
-            $config = $this->getConfiguration();
-            $persistent = $config["persistent"] ?? true;
-            $hostname = $persistent ? "p:" . $config["hostname"] : $config["hostname"];
-            $port = $config["port"] ?? 3306;
-            try {
-                $this->mysqli = new mysqli($hostname, $config["username"],
-                    $config["password"], $config["database"], $port);
-                Log::info("Created connection to mysql database '" . $config["database"] . "'");
-            } catch (Exception $e) {
-                $msg = "Could not create connection to mysql database '"
-                    . $config["database"] . "'";
-                Log::alert($msg, [$e]);
-                throw new Exception($msg, 100, $e);
-            }
-        }
-        return $this->mysqli;
     }
 
     /**

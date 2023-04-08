@@ -19,14 +19,61 @@ class Entity implements EntityInterface {
      *
      * @param int|null $ID the ID of the newly created Entity or *null* if it has no ID
      */
-    function __construct(private readonly ?int $ID = null) {}
+    function __construct(private readonly ?int $ID = null) {
+    }
 
     /**
      * @inheritdoc
-     * @return int|null
+     * @param int|null $ID
+     * @return Entity Entity, similar to this one, with the given ID
+     * @throws ReflectionException
      */
-    public function getID(): ?int {
-        return $this->ID;
+    public function clone(?int $ID = null): Entity {
+        $arr = $this->toArray();
+        $arr["ID"] = $ID;
+        return static::fromArray($arr);
+    }
+
+    /**
+     * @inheritdoc
+     * @return array array with properties
+     * @see Entity::fromArray()
+     */
+    public function toArray(): array {
+        $arr = [];
+        foreach ($this->getParents() as $parent) {
+            foreach ($parent->getProperties() as $prop) {
+                $val = $prop->getValue($this);
+                if ($prop->getType()->getName() == "bool") {
+                    $val = $val ? 1 : 0;
+                }
+                $arr[$prop->getName()] = $val;
+            }
+        }
+        return $arr;
+    }
+
+    /**
+     * Get the (Reflection) parents of this Entity in reverse order
+     *
+     * ```
+     * class A extends Entity
+     *
+     * class B extends A
+     *
+     * returned array = [Entity-Reflection, A-Reflection, B-Reflection]
+     * ```
+     *
+     * @return array array with {@link ReflectionClass} parents and this Entity
+     */
+    public function getParents(): array {
+        $parents = [];
+        $rc = new ReflectionClass($this);
+        do {
+            $parents[] = $rc;
+            $rc = $rc->getParentClass();
+        } while ($rc);
+        return array_reverse($parents);
     }
 
     /**
@@ -55,33 +102,12 @@ class Entity implements EntityInterface {
 
     /**
      * @inheritdoc
-     * @return array array with properties
-     * @see Entity::fromArray()
+     * @param Entity $other
+     * @return bool
      */
-    public function toArray(): array {
-        $arr = [];
-        foreach ($this->getParents() as $parent) {
-            foreach ($parent->getProperties() as $prop) {
-                $val = $prop->getValue($this);
-                if ($prop->getType()->getName() == "bool") {
-                    $val = $val ? 1 : 0;
-                }
-                $arr[$prop->getName()] = $val;
-            }
-        }
-        return $arr;
-    }
-
-    /**
-     * @inheritdoc
-     * @param int|null $ID
-     * @return Entity Entity, similar to this one, with the given ID
-     * @throws ReflectionException
-     */
-    public function clone(?int $ID = null): Entity {
-        $arr = $this->toArray();
-        $arr["ID"] = $ID;
-        return static::fromArray($arr);
+    public function isSame(Entity $other): bool {
+        return $this->equals($other) and
+            $this->getID() === $other->getID();
     }
 
     /**
@@ -96,12 +122,10 @@ class Entity implements EntityInterface {
 
     /**
      * @inheritdoc
-     * @param Entity $other
-     * @return bool
+     * @return int|null
      */
-    public function isSame(Entity $other): bool {
-        return $this->equals($other) and
-            $this->getID() === $other->getID();
+    public function getID(): ?int {
+        return $this->ID;
     }
 
     /**
@@ -124,29 +148,6 @@ class Entity implements EntityInterface {
             }
         }
         return $s;
-    }
-
-    /**
-     * Get the (Reflection) parents of this Entity in reverse order
-     *
-     * ```
-     * class A extends Entity
-     *
-     * class B extends A
-     *
-     * returned array = [Entity-Reflection, A-Reflection, B-Reflection]
-     * ```
-     *
-     * @return array array with {@link ReflectionClass} parents and this Entity
-     */
-    public function getParents(): array {
-        $parents = [];
-        $rc = new ReflectionClass($this);
-        do {
-            $parents[] = $rc;
-            $rc = $rc->getParentClass();
-        } while ($rc);
-        return array_reverse($parents);
     }
 
 }
