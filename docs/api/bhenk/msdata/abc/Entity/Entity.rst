@@ -51,7 +51,7 @@ Entity
    namespace        bhenk\\msdata\\abc                                                                                           
    predicates       Cloneable | Instantiable                                                                                     
    implements       :ref:`bhenk\msdata\abc\EntityInterface` | `Stringable <https://www.php.net/manual/en/class.stringable.php>`_ 
-   known subclasses :ref:`bhenk\msdata\node\NodeDo` | :ref:`bhenk\msdata\user\UserDo`                                            
+   known subclasses :ref:`bhenk\msdata\abc\Join` | :ref:`bhenk\msdata\node\NodeDo` | :ref:`bhenk\msdata\user\UserDo`             
    ================ ============================================================================================================ 
 
 
@@ -493,4 +493,4 @@ Entity::getParents
 
 ----
 
-:block:`Sat, 08 Apr 2023 09:06:57 +0000` 
+:block:`Sat, 08 Apr 2023 17:52:22 +0000` 

@@ -4,7 +4,9 @@ namespace bhenk\msdata\abc;
 
 use bhenk\logger\log\Log;
 use bhenk\msdata\connector\MysqlConnector;
+use Closure;
 use Exception;
+use PHPUnit\Framework\Constraint\Callback;
 use ReflectionClass;
 use ReflectionException;
 use Throwable;
@@ -348,13 +350,26 @@ abstract class AbstractDao {
      * ```
      * SELECT FROM %table_name% WHERE %expression%
      * ```
-     * The returned Entity[] array has Entity IDs as keys.
+     * The optional {@link $func} receives selected Entities and can decide what key
+     * the Entity will have in the returned Entity[] array.
+     * Default: the returned Entity[] array has Entity IDs as keys.
+     * ```
+     * $func = function(Entity $entity): int {
+     *     return  $entity->getID();
+     * };
+     * ```
      *
      * @param string $where_clause expression
+     * @param Closure|null $func if given decides which keys the returned array will have
      * @return Entity[] array of Entities or empty array if none found
      * @throws Exception code 204
      */
-    public function selectWhere(string $where_clause): array {
+    public function selectWhere(string $where_clause, Closure $func = null): array {
+        if (is_null($func)) {
+            $func = function(Entity $entity): int {
+                return  $entity->getID();
+            };
+        }
         $sql = /** @lang text */
             "SELECT * FROM `" . $this->getTableName() . "` WHERE " . $where_clause;
         Log::debug($sql);
@@ -368,7 +383,7 @@ abstract class AbstractDao {
             $result = $conn->query($sql);
             while ($row = $result->fetch_assoc()) {
                 $entity = $do::fromArray($row);
-                $selected[$entity->getID()] = $entity;
+                $selected[$func($entity)] = $entity;
                 $row_count++;
             }
             Log::debug("SELECT row count: " . $row_count);

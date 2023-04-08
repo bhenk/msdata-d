@@ -38,22 +38,28 @@
 
 .. end required roles
 
-.. _bhenk\msdata\node\NodeDo:
+.. _bhenk\msdata\abc\Join:
 
-NodeDo
-======
+Join
+====
 
 .. table::
    :widths: auto
    :align: left
 
    ========== ============================================================================================================ 
-   namespace  bhenk\\msdata\\node                                                                                          
+   namespace  bhenk\\msdata\\abc                                                                                           
    predicates Cloneable | Instantiable                                                                                     
    implements `Stringable <https://www.php.net/manual/en/class.stringable.php>`_ | :ref:`bhenk\msdata\abc\EntityInterface` 
    extends    :ref:`bhenk\msdata\abc\Entity`                                                                               
-   hierarchy  :ref:`bhenk\msdata\node\NodeDo` -> :ref:`bhenk\msdata\abc\Entity`                                            
+   hierarchy  :ref:`bhenk\msdata\abc\Join` -> :ref:`bhenk\msdata\abc\Entity`                                               
    ========== ============================================================================================================ 
+
+
+**A basic Entity for a join function**
+
+
+Join can be used when expressing a many-to-many relation
 
 
 .. contents::
@@ -62,16 +68,16 @@ NodeDo
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::Constructor:
+.. _bhenk\msdata\abc\Join::Constructor:
 
 Constructor
 +++++++++++
 
 
-.. _bhenk\msdata\node\NodeDo::__construct:
+.. _bhenk\msdata\abc\Join::__construct:
 
-NodeDo::__construct
--------------------
+Join::__construct
+-----------------
 
 .. table::
    :widths: auto
@@ -82,41 +88,36 @@ NodeDo::__construct
    ========== ==================== 
 
 
+**Constructs a new Join**
+
+
 .. code-block:: php
 
    public function __construct(
          Parameter #0 [ <optional> ?int $ID = NULL ]
-         Parameter #1 [ <optional> ?int $parent_id = NULL ]
-         Parameter #2 [ <optional> ?string $name = NULL ]
-         Parameter #3 [ <optional> ?string $alias = NULL ]
-         Parameter #4 [ <optional> ?string $nature = NULL ]
-         Parameter #5 [ <optional> bool $public = true ]
-         Parameter #6 [ <optional> float $estimate = 0.0 ]
+         Parameter #1 [ <optional> ?int $FK_LEFT = NULL ]
+         Parameter #2 [ <optional> ?int $FK_RIGHT = NULL ]
     )
 
 
-| :tag5:`param` ?\ int :param:`$ID`
-| :tag5:`param` ?\ int :param:`$parent_id`
-| :tag5:`param` ?\ string :param:`$name`
-| :tag5:`param` ?\ string :param:`$alias`
-| :tag5:`param` ?\ string :param:`$nature`
-| :tag5:`param` bool :param:`$public`
-| :tag5:`param` float :param:`$estimate`
+| :tag5:`param` ?\ int :param:`$ID` - ID of this Join
+| :tag5:`param` ?\ int :param:`$FK_LEFT` - the left hand foreign key
+| :tag5:`param` ?\ int :param:`$FK_RIGHT` - the right hand foreign key
 
 
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::Methods:
+.. _bhenk\msdata\abc\Join::Methods:
 
 Methods
 +++++++
 
 
-.. _bhenk\msdata\node\NodeDo::getParentId:
+.. _bhenk\msdata\abc\Join::getFkLeft:
 
-NodeDo::getParentId
--------------------
+Join::getFkLeft
+---------------
 
 .. table::
    :widths: auto
@@ -127,12 +128,12 @@ NodeDo::getParentId
    ========== ====== 
 
 
-
+**Get the left hand foreign key**
 
 
 .. code-block:: php
 
-   public function getParentId(): ?int
+   public function getFkLeft(): ?int
 
 
 | :tag6:`return` ?\ int
@@ -141,40 +142,9 @@ NodeDo::getParentId
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::setParentId:
+.. _bhenk\msdata\abc\Join::setFkLeft:
 
-NodeDo::setParentId
--------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-
-
-
-.. code-block:: php
-
-   public function setParentId(
-         Parameter #0 [ <required> ?int $parent_id ]
-    ): void
-
-
-| :tag6:`param` ?\ int :param:`$parent_id`
-| :tag6:`return` void
-
-
-----
-
-
-.. _bhenk\msdata\node\NodeDo::getName:
-
-NodeDo::getName
+Join::setFkLeft
 ---------------
 
 .. table::
@@ -186,54 +156,26 @@ NodeDo::getName
    ========== ====== 
 
 
-
-
-
-.. code-block:: php
-
-   public function getName(): ?string
-
-
-| :tag6:`return` ?\ string
-
-
-----
-
-
-.. _bhenk\msdata\node\NodeDo::setName:
-
-NodeDo::setName
----------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-
+**Set the left hand foreign key**
 
 
 .. code-block:: php
 
-   public function setName(
-         Parameter #0 [ <required> ?string $name ]
+   public function setFkLeft(
+         Parameter #0 [ <required> ?int $FK_LEFT ]
     ): void
 
 
-| :tag6:`param` ?\ string :param:`$name`
+| :tag6:`param` ?\ int :param:`$FK_LEFT`
 | :tag6:`return` void
 
 
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::getAlias:
+.. _bhenk\msdata\abc\Join::getFkRight:
 
-NodeDo::getAlias
+Join::getFkRight
 ----------------
 
 .. table::
@@ -245,23 +187,23 @@ NodeDo::getAlias
    ========== ====== 
 
 
-
+**Get the right hand foreign key**
 
 
 .. code-block:: php
 
-   public function getAlias(): ?string
+   public function getFkRight(): ?int
 
 
-| :tag6:`return` ?\ string
+| :tag6:`return` ?\ int
 
 
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::setAlias:
+.. _bhenk\msdata\abc\Join::setFkRight:
 
-NodeDo::setAlias
+Join::setFkRight
 ----------------
 
 .. table::
@@ -273,204 +215,27 @@ NodeDo::setAlias
    ========== ====== 
 
 
-
+**Set the right hand foreign key**
 
 
 .. code-block:: php
 
-   public function setAlias(
-         Parameter #0 [ <required> ?string $alias ]
+   public function setFkRight(
+         Parameter #0 [ <required> ?int $FK_RIGHT ]
     ): void
 
 
-| :tag6:`param` ?\ string :param:`$alias`
+| :tag6:`param` ?\ int :param:`$FK_RIGHT`
 | :tag6:`return` void
 
 
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::getNature:
+.. _bhenk\msdata\abc\Join::getID:
 
-NodeDo::getNature
------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-
-
-
-.. code-block:: php
-
-   public function getNature(): ?string
-
-
-| :tag6:`return` ?\ string
-
-
-----
-
-
-.. _bhenk\msdata\node\NodeDo::setNature:
-
-NodeDo::setNature
------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-
-
-
-.. code-block:: php
-
-   public function setNature(
-         Parameter #0 [ <required> ?string $nature ]
-    ): void
-
-
-| :tag6:`param` ?\ string :param:`$nature`
-| :tag6:`return` void
-
-
-----
-
-
-.. _bhenk\msdata\node\NodeDo::isPublic:
-
-NodeDo::isPublic
-----------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-
-
-
-.. code-block:: php
-
-   public function isPublic(): bool
-
-
-| :tag6:`return` bool
-
-
-----
-
-
-.. _bhenk\msdata\node\NodeDo::setPublic:
-
-NodeDo::setPublic
------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-
-
-
-.. code-block:: php
-
-   public function setPublic(
-         Parameter #0 [ <required> bool $public ]
-    ): void
-
-
-| :tag6:`param` bool :param:`$public`
-| :tag6:`return` void
-
-
-----
-
-
-.. _bhenk\msdata\node\NodeDo::getEstimate:
-
-NodeDo::getEstimate
--------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-
-
-
-.. code-block:: php
-
-   public function getEstimate(): float
-
-
-| :tag6:`return` float
-
-
-----
-
-
-.. _bhenk\msdata\node\NodeDo::setEstimate:
-
-NodeDo::setEstimate
--------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-
-
-
-.. code-block:: php
-
-   public function setEstimate(
-         Parameter #0 [ <required> float $estimate ]
-    ): void
-
-
-| :tag6:`param` float :param:`$estimate`
-| :tag6:`return` void
-
-
-----
-
-
-.. _bhenk\msdata\node\NodeDo::getID:
-
-NodeDo::getID
--------------
+Join::getID
+-----------
 
 .. table::
    :widths: auto
@@ -511,10 +276,10 @@ NodeDo::getID
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::fromArray:
+.. _bhenk\msdata\abc\Join::fromArray:
 
-NodeDo::fromArray
------------------
+Join::fromArray
+---------------
 
 .. table::
    :widths: auto
@@ -557,7 +322,7 @@ properties/parameters have the order:
    **Create a new Entity from an array of properties**
    
    
-   The given array should have the same order as the one gotten from `EntityInterface::toArray() <https://www.google.com/search?q=EntityInterface::toArray()>`_.
+   The given array should have the same order as the one gotten from :ref:`bhenk\msdata\abc\EntityInterface::toArray`.
    
    
    | :tag6:`param` array :param:`$arr` - property array
@@ -583,10 +348,10 @@ properties/parameters have the order:
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::toArray:
+.. _bhenk\msdata\abc\Join::toArray:
 
-NodeDo::toArray
----------------
+Join::toArray
+-------------
 
 .. table::
    :widths: auto
@@ -611,7 +376,7 @@ NodeDo::toArray
    
    
    The returned array should be in such order that it can be fet to the static method
-   `EntityInterface::fromArray() <https://www.google.com/search?q=EntityInterface::fromArray()>`_.
+   :ref:`bhenk\msdata\abc\EntityInterface::fromArray`.
    
    | :tag6:`return` array  - array with properties of this Entity
    
@@ -637,10 +402,10 @@ NodeDo::toArray
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::clone:
+.. _bhenk\msdata\abc\Join::clone:
 
-NodeDo::clone
--------------
+Join::clone
+-----------
 
 .. table::
    :widths: auto
@@ -689,10 +454,10 @@ NodeDo::clone
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::equals:
+.. _bhenk\msdata\abc\Join::equals:
 
-NodeDo::equals
---------------
+Join::equals
+------------
 
 .. table::
    :widths: auto
@@ -740,10 +505,10 @@ NodeDo::equals
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::isSame:
+.. _bhenk\msdata\abc\Join::isSame:
 
-NodeDo::isSame
---------------
+Join::isSame
+------------
 
 .. table::
    :widths: auto
@@ -791,10 +556,10 @@ NodeDo::isSame
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::__toString:
+.. _bhenk\msdata\abc\Join::__toString:
 
-NodeDo::__toString
-------------------
+Join::__toString
+----------------
 
 .. table::
    :widths: auto
@@ -821,10 +586,10 @@ NodeDo::__toString
 ----
 
 
-.. _bhenk\msdata\node\NodeDo::getParents:
+.. _bhenk\msdata\abc\Join::getParents:
 
-NodeDo::getParents
-------------------
+Join::getParents
+----------------
 
 .. table::
    :widths: auto

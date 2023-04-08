@@ -555,7 +555,17 @@ UserDao::selectWhere
    SELECT FROM %table_name% WHERE %expression%
 
 
-The returned Entity[] array has Entity IDs as keys.
+The optional :tagsign:`param` :tech:`$func` receives selected Entities and can decide what key
+the Entity will have in the returned Entity[] array.
+Default: the returned Entity[] array has Entity IDs as keys.
+
+..  code-block::
+
+   $func = function(Entity $entity): int {
+       return  $entity->getID();
+   };
+
+
 
 
 
@@ -563,14 +573,16 @@ The returned Entity[] array has Entity IDs as keys.
 
    public function selectWhere(
          Parameter #0 [ <required> string $where_clause ]
+         Parameter #1 [ <optional> ?Closure $func = NULL ]
     ): array
 
 
 | :tag6:`param` string :param:`$where_clause` - expression
+| :tag6:`param` ?\ `Closure <https://www.php.net/manual/en/class.closure.php>`_ :param:`$func` - if given decides which keys the returned array will have
 | :tag6:`return` array  - array of Entities or empty array if none found
 | :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 204
 
 
 ----
 
-:block:`Sat, 08 Apr 2023 09:06:57 +0000` 
+:block:`Sat, 08 Apr 2023 17:52:22 +0000` 

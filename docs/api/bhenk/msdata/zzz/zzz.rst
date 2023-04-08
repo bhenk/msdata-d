@@ -38,15 +38,20 @@
 
 .. end required roles
 
-.. _bhenk\msdata\connector:
+.. _bhenk\msdata\zzz:
 
-connector
-=========
+zzz
+===
 
+.. table::
+   :widths: auto
+   :align: left
 
-
-**Database connectors**
-
+   ======================= =============================== 
+   Depends on              Dependency invoked by           
+   ======================= =============================== 
+   :ref:`bhenk\msdata\abc` :ref:`bhenk\msdata\zzz\JoinDao` 
+   ======================= =============================== 
 
 
 .. toctree::
@@ -54,7 +59,7 @@ connector
    :titlesonly:
    :caption: classes
 
-   MysqlConnector/MysqlConnector
+   JoinDao/JoinDao
 
 
 

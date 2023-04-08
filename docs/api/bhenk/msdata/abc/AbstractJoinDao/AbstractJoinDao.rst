@@ -38,21 +38,28 @@
 
 .. end required roles
 
-.. _bhenk\msdata\node\NodeDao:
+.. _bhenk\msdata\abc\AbstractJoinDao:
 
-NodeDao
-=======
+AbstractJoinDao
+===============
 
 .. table::
    :widths: auto
    :align: left
 
-   ========== ======================================================================= 
-   namespace  bhenk\\msdata\\node                                                     
-   predicates Cloneable | Instantiable                                                
-   extends    :ref:`bhenk\msdata\abc\AbstractDao`                                     
-   hierarchy  :ref:`bhenk\msdata\node\NodeDao` -> :ref:`bhenk\msdata\abc\AbstractDao` 
-   ========== ======================================================================= 
+   ================ ============================================================================== 
+   namespace        bhenk\\msdata\\abc                                                             
+   predicates       Abstract                                                                       
+   extends          :ref:`bhenk\msdata\abc\AbstractDao`                                            
+   hierarchy        :ref:`bhenk\msdata\abc\AbstractJoinDao` -> :ref:`bhenk\msdata\abc\AbstractDao` 
+   known subclasses :ref:`bhenk\msdata\zzz\JoinDao`                                                
+   ================ ============================================================================== 
+
+
+**Abstract Dao for a join table**
+
+
+The corresponding Data Object is envisaged to extend :ref:`bhenk\msdata\abc\Join`.
 
 
 .. contents::
@@ -61,101 +68,16 @@ NodeDao
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::Constants:
-
-Constants
-+++++++++
-
-
-.. _bhenk\msdata\node\NodeDao::TABLE_NAME:
-
-NodeDao::TABLE_NAME
--------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-
-
-
-.. code-block:: php
-
-   string(8) "tbl_node" 
-
-
-
-
-----
-
-
-.. _bhenk\msdata\node\NodeDao::Methods:
+.. _bhenk\msdata\abc\AbstractJoinDao::Methods:
 
 Methods
 +++++++
 
 
-.. _bhenk\msdata\node\NodeDao::getDataObjectName:
+.. _bhenk\msdata\abc\AbstractJoinDao::selectLeft:
 
-NodeDao::getDataObjectName
---------------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====================================================== 
-   predicates public                                                 
-   implements :ref:`bhenk\msdata\abc\AbstractDao::getDataObjectName` 
-   ========== ====================================================== 
-
-
-.. code-block:: php
-
-   public function getDataObjectName(): string
-
-
-| :tag6:`return` string
-
-
-----
-
-
-.. _bhenk\msdata\node\NodeDao::getTableName:
-
-NodeDao::getTableName
----------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ================================================= 
-   predicates public                                            
-   implements :ref:`bhenk\msdata\abc\AbstractDao::getTableName` 
-   ========== ================================================= 
-
-
-.. code-block:: php
-
-   public function getTableName(): string
-
-
-| :tag6:`return` string
-
-
-----
-
-
-.. _bhenk\msdata\node\NodeDao::selectChildren:
-
-NodeDao::selectChildren
------------------------
+AbstractJoinDao::selectLeft
+---------------------------
 
 .. table::
    :widths: auto
@@ -166,24 +88,28 @@ NodeDao::selectChildren
    ========== ====== 
 
 
+**Select on left hand foreign key**
+
+
 .. code-block:: php
 
-   public function selectChildren(
-         Parameter #0 [ <required> int $ID ]
+   public function selectLeft(
+         Parameter #0 [ <required> int $fk_left ]
     ): array
 
 
-| :tag6:`param` int :param:`$ID`
-| :tag6:`return` array
+| :tag6:`param` int :param:`$fk_left` - left hand foreign key
+| :tag6:`return` array  - with right hand IDs as key
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_
 
 
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::selectGenerationNumbers:
+.. _bhenk\msdata\abc\AbstractJoinDao::selectRight:
 
-NodeDao::selectGenerationNumbers
---------------------------------
+AbstractJoinDao::selectRight
+----------------------------
 
 .. table::
    :widths: auto
@@ -194,21 +120,86 @@ NodeDao::selectGenerationNumbers
    ========== ====== 
 
 
+**Select on right hand foreign key**
+
+
 .. code-block:: php
 
-   public function selectGenerationNumbers(): array
+   public function selectRight(
+         Parameter #0 [ <required> int $fk_right ]
+    ): array
 
 
-| :tag6:`return` array
+| :tag6:`param` int :param:`$fk_right` - right hand foreign key
+| :tag6:`return` array  - with left hand IDs as key
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_
 
 
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::getCreateTableStatement:
+.. _bhenk\msdata\abc\AbstractJoinDao::getDataObjectName:
 
-NodeDao::getCreateTableStatement
---------------------------------
+AbstractJoinDao::getDataObjectName
+----------------------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ============== ====================================================== 
+   predicates     public | abstract                                      
+   inherited from :ref:`bhenk\msdata\abc\AbstractDao::getDataObjectName` 
+   ============== ====================================================== 
+
+
+**Get the fully qualified classname of the** :ref:`bhenk\msdata\abc\Entity` **this class provides access to**
+
+
+.. code-block:: php
+
+   public abstract function getDataObjectName(): string
+
+
+| :tag6:`return` string  - fully qualified classname
+
+
+----
+
+
+.. _bhenk\msdata\abc\AbstractJoinDao::getTableName:
+
+AbstractJoinDao::getTableName
+-----------------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ============== ================================================= 
+   predicates     public | abstract                                 
+   inherited from :ref:`bhenk\msdata\abc\AbstractDao::getTableName` 
+   ============== ================================================= 
+
+
+**Get the name of the table that will store the** :ref:`Entities <bhenk\msdata\abc\Entity>` **this class provides access to**
+
+
+.. code-block:: php
+
+   public abstract function getTableName(): string
+
+
+| :tag6:`return` string  - name of table reserved for DO
+
+
+----
+
+
+.. _bhenk\msdata\abc\AbstractJoinDao::getCreateTableStatement:
+
+AbstractJoinDao::getCreateTableStatement
+----------------------------------------
 
 .. table::
    :widths: auto
@@ -258,10 +249,10 @@ Subclasses may override. The table MUST have the same name as the one returned b
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::createTable:
+.. _bhenk\msdata\abc\AbstractJoinDao::createTable:
 
-NodeDao::createTable
---------------------
+AbstractJoinDao::createTable
+----------------------------
 
 .. table::
    :widths: auto
@@ -296,10 +287,10 @@ The statement used is the one from :ref:`getCreateTableStatement <bhenk\msdata\a
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::insert:
+.. _bhenk\msdata\abc\AbstractJoinDao::insert:
 
-NodeDao::insert
----------------
+AbstractJoinDao::insert
+-----------------------
 
 .. table::
    :widths: auto
@@ -314,7 +305,7 @@ NodeDao::insert
 **Insert the given Entity**
 
 
-The :tech:`ID` of the `Entity <https://www.google.com/search?q=Entity>`_ (if any) will be ignored. Returns an Entity equal to the
+The :tech:`ID` of the :ref:`bhenk\msdata\abc\Entity` (if any) will be ignored. Returns an Entity equal to the
 given Entity with the new :tech:`ID`.
 
 
@@ -334,10 +325,10 @@ given Entity with the new :tech:`ID`.
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::update:
+.. _bhenk\msdata\abc\AbstractJoinDao::update:
 
-NodeDao::update
----------------
+AbstractJoinDao::update
+-----------------------
 
 .. table::
    :widths: auto
@@ -367,10 +358,10 @@ NodeDao::update
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::delete:
+.. _bhenk\msdata\abc\AbstractJoinDao::delete:
 
-NodeDao::delete
----------------
+AbstractJoinDao::delete
+-----------------------
 
 .. table::
    :widths: auto
@@ -400,10 +391,10 @@ NodeDao::delete
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::select:
+.. _bhenk\msdata\abc\AbstractJoinDao::select:
 
-NodeDao::select
----------------
+AbstractJoinDao::select
+-----------------------
 
 .. table::
    :widths: auto
@@ -433,10 +424,10 @@ NodeDao::select
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::insertBatch:
+.. _bhenk\msdata\abc\AbstractJoinDao::insertBatch:
 
-NodeDao::insertBatch
---------------------
+AbstractJoinDao::insertBatch
+----------------------------
 
 .. table::
    :widths: auto
@@ -451,7 +442,7 @@ NodeDao::insertBatch
 **Insert the Entities from the given array**
 
 
-The :tech:`ID` of the `Entity <https://www.google.com/search?q=Entity>`_ (if any) will be ignored. Returns an array of
+The :tech:`ID` of the :ref:`Entities <bhenk\msdata\abc\Entity>` (if any) will be ignored. Returns an array of
 Entities equal to the
 given Entities with new :tech:`ID`\ s and ID as array key.
 
@@ -472,10 +463,10 @@ given Entities with new :tech:`ID`\ s and ID as array key.
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::updateBatch:
+.. _bhenk\msdata\abc\AbstractJoinDao::updateBatch:
 
-NodeDao::updateBatch
---------------------
+AbstractJoinDao::updateBatch
+----------------------------
 
 .. table::
    :widths: auto
@@ -505,10 +496,10 @@ NodeDao::updateBatch
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::deleteBatch:
+.. _bhenk\msdata\abc\AbstractJoinDao::deleteBatch:
 
-NodeDao::deleteBatch
---------------------
+AbstractJoinDao::deleteBatch
+----------------------------
 
 .. table::
    :widths: auto
@@ -538,10 +529,10 @@ NodeDao::deleteBatch
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::deleteWhere:
+.. _bhenk\msdata\abc\AbstractJoinDao::deleteWhere:
 
-NodeDao::deleteWhere
---------------------
+AbstractJoinDao::deleteWhere
+----------------------------
 
 .. table::
    :widths: auto
@@ -580,10 +571,10 @@ NodeDao::deleteWhere
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::selectBatch:
+.. _bhenk\msdata\abc\AbstractJoinDao::selectBatch:
 
-NodeDao::selectBatch
---------------------
+AbstractJoinDao::selectBatch
+----------------------------
 
 .. table::
    :widths: auto
@@ -617,10 +608,10 @@ The returned Entity[] array has Entity IDs as keys.
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::selectWhere:
+.. _bhenk\msdata\abc\AbstractJoinDao::selectWhere:
 
-NodeDao::selectWhere
---------------------
+AbstractJoinDao::selectWhere
+----------------------------
 
 .. table::
    :widths: auto

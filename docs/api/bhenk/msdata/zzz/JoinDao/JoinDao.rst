@@ -38,21 +38,21 @@
 
 .. end required roles
 
-.. _bhenk\msdata\node\NodeDao:
+.. _bhenk\msdata\zzz\JoinDao:
 
-NodeDao
+JoinDao
 =======
 
 .. table::
    :widths: auto
    :align: left
 
-   ========== ======================================================================= 
-   namespace  bhenk\\msdata\\node                                                     
-   predicates Cloneable | Instantiable                                                
-   extends    :ref:`bhenk\msdata\abc\AbstractDao`                                     
-   hierarchy  :ref:`bhenk\msdata\node\NodeDao` -> :ref:`bhenk\msdata\abc\AbstractDao` 
-   ========== ======================================================================= 
+   ========== ================================================================================================================= 
+   namespace  bhenk\\msdata\\zzz                                                                                                
+   predicates Cloneable | Instantiable                                                                                          
+   extends    :ref:`bhenk\msdata\abc\AbstractJoinDao`                                                                           
+   hierarchy  :ref:`bhenk\msdata\zzz\JoinDao` -> :ref:`bhenk\msdata\abc\AbstractJoinDao` -> :ref:`bhenk\msdata\abc\AbstractDao` 
+   ========== ================================================================================================================= 
 
 
 .. contents::
@@ -61,48 +61,15 @@ NodeDao
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::Constants:
-
-Constants
-+++++++++
-
-
-.. _bhenk\msdata\node\NodeDao::TABLE_NAME:
-
-NodeDao::TABLE_NAME
--------------------
-
-.. table::
-   :widths: auto
-   :align: left
-
-   ========== ====== 
-   predicates public 
-   ========== ====== 
-
-
-
-
-
-.. code-block:: php
-
-   string(8) "tbl_node" 
-
-
-
-
-----
-
-
-.. _bhenk\msdata\node\NodeDao::Methods:
+.. _bhenk\msdata\zzz\JoinDao::Methods:
 
 Methods
 +++++++
 
 
-.. _bhenk\msdata\node\NodeDao::getDataObjectName:
+.. _bhenk\msdata\zzz\JoinDao::getDataObjectName:
 
-NodeDao::getDataObjectName
+JoinDao::getDataObjectName
 --------------------------
 
 .. table::
@@ -113,6 +80,23 @@ NodeDao::getDataObjectName
    predicates public                                                 
    implements :ref:`bhenk\msdata\abc\AbstractDao::getDataObjectName` 
    ========== ====================================================== 
+
+
+
+
+
+
+.. admonition:: @inheritdoc
+
+    
+
+   **Get the fully qualified classname of the** `Entity <https://www.google.com/search?q=Entity>`_ **this class provides access to**
+   
+   | :tag6:`return` string  - fully qualified classname
+   
+   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\AbstractDao::getDataObjectName`
+
+
 
 
 .. code-block:: php
@@ -126,9 +110,9 @@ NodeDao::getDataObjectName
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::getTableName:
+.. _bhenk\msdata\zzz\JoinDao::getTableName:
 
-NodeDao::getTableName
+JoinDao::getTableName
 ---------------------
 
 .. table::
@@ -139,6 +123,23 @@ NodeDao::getTableName
    predicates public                                            
    implements :ref:`bhenk\msdata\abc\AbstractDao::getTableName` 
    ========== ================================================= 
+
+
+
+
+
+
+.. admonition:: @inheritdoc
+
+    
+
+   **Get the name of the table that will store the** `Entity <https://www.google.com/search?q=Entity>`_ **this class provides access to**
+   
+   | :tag6:`return` string  - name of table reserved for DO
+   
+   ``@inheritdoc`` from method :ref:`bhenk\msdata\abc\AbstractDao::getTableName`
+
+
 
 
 .. code-block:: php
@@ -152,62 +153,75 @@ NodeDao::getTableName
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::selectChildren:
+.. _bhenk\msdata\zzz\JoinDao::selectLeft:
 
-NodeDao::selectChildren
------------------------
+JoinDao::selectLeft
+-------------------
 
 .. table::
    :widths: auto
    :align: left
 
-   ========== ====== 
-   predicates public 
-   ========== ====== 
+   ============== =================================================== 
+   predicates     public                                              
+   inherited from :ref:`bhenk\msdata\abc\AbstractJoinDao::selectLeft` 
+   ============== =================================================== 
+
+
+**Select on left hand foreign key**
 
 
 .. code-block:: php
 
-   public function selectChildren(
-         Parameter #0 [ <required> int $ID ]
+   public function selectLeft(
+         Parameter #0 [ <required> int $fk_left ]
     ): array
 
 
-| :tag6:`param` int :param:`$ID`
-| :tag6:`return` array
+| :tag6:`param` int :param:`$fk_left` - left hand foreign key
+| :tag6:`return` array  - with right hand IDs as key
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_
 
 
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::selectGenerationNumbers:
+.. _bhenk\msdata\zzz\JoinDao::selectRight:
 
-NodeDao::selectGenerationNumbers
---------------------------------
+JoinDao::selectRight
+--------------------
 
 .. table::
    :widths: auto
    :align: left
 
-   ========== ====== 
-   predicates public 
-   ========== ====== 
+   ============== ==================================================== 
+   predicates     public                                               
+   inherited from :ref:`bhenk\msdata\abc\AbstractJoinDao::selectRight` 
+   ============== ==================================================== 
+
+
+**Select on right hand foreign key**
 
 
 .. code-block:: php
 
-   public function selectGenerationNumbers(): array
+   public function selectRight(
+         Parameter #0 [ <required> int $fk_right ]
+    ): array
 
 
-| :tag6:`return` array
+| :tag6:`param` int :param:`$fk_right` - right hand foreign key
+| :tag6:`return` array  - with left hand IDs as key
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_
 
 
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::getCreateTableStatement:
+.. _bhenk\msdata\zzz\JoinDao::getCreateTableStatement:
 
-NodeDao::getCreateTableStatement
+JoinDao::getCreateTableStatement
 --------------------------------
 
 .. table::
@@ -242,7 +256,7 @@ In the above :tech:`%xyz%` is placeholder for table name or property name. Notic
 parameters have a limited length of 255 characters.
 
 Subclasses may override. The table MUST have the same name as the one returned by the method
-:ref:`getTableName <bhenk\msdata\abc\AbstractDao::getTableName>`.
+`AbstractDao::getTableName() <https://www.google.com/search?q=AbstractDao::getTableName()>`_.
 
 
 
@@ -258,9 +272,9 @@ Subclasses may override. The table MUST have the same name as the one returned b
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::createTable:
+.. _bhenk\msdata\zzz\JoinDao::createTable:
 
-NodeDao::createTable
+JoinDao::createTable
 --------------------
 
 .. table::
@@ -276,7 +290,7 @@ NodeDao::createTable
 **Create a table in the database**
 
 
-The statement used is the one from :ref:`getCreateTableStatement <bhenk\msdata\abc\AbstractDao::getCreateTableStatement>`.
+The statement used is the one from `AbstractDao::getCreateTableStatement() <https://www.google.com/search?q=AbstractDao::getCreateTableStatement()>`_.
 
 
 
@@ -296,9 +310,9 @@ The statement used is the one from :ref:`getCreateTableStatement <bhenk\msdata\a
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::insert:
+.. _bhenk\msdata\zzz\JoinDao::insert:
 
-NodeDao::insert
+JoinDao::insert
 ---------------
 
 .. table::
@@ -334,9 +348,9 @@ given Entity with the new :tech:`ID`.
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::update:
+.. _bhenk\msdata\zzz\JoinDao::update:
 
-NodeDao::update
+JoinDao::update
 ---------------
 
 .. table::
@@ -367,9 +381,9 @@ NodeDao::update
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::delete:
+.. _bhenk\msdata\zzz\JoinDao::delete:
 
-NodeDao::delete
+JoinDao::delete
 ---------------
 
 .. table::
@@ -400,9 +414,9 @@ NodeDao::delete
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::select:
+.. _bhenk\msdata\zzz\JoinDao::select:
 
-NodeDao::select
+JoinDao::select
 ---------------
 
 .. table::
@@ -433,9 +447,9 @@ NodeDao::select
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::insertBatch:
+.. _bhenk\msdata\zzz\JoinDao::insertBatch:
 
-NodeDao::insertBatch
+JoinDao::insertBatch
 --------------------
 
 .. table::
@@ -472,9 +486,9 @@ given Entities with new :tech:`ID`\ s and ID as array key.
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::updateBatch:
+.. _bhenk\msdata\zzz\JoinDao::updateBatch:
 
-NodeDao::updateBatch
+JoinDao::updateBatch
 --------------------
 
 .. table::
@@ -505,9 +519,9 @@ NodeDao::updateBatch
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::deleteBatch:
+.. _bhenk\msdata\zzz\JoinDao::deleteBatch:
 
-NodeDao::deleteBatch
+JoinDao::deleteBatch
 --------------------
 
 .. table::
@@ -538,9 +552,9 @@ NodeDao::deleteBatch
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::deleteWhere:
+.. _bhenk\msdata\zzz\JoinDao::deleteWhere:
 
-NodeDao::deleteWhere
+JoinDao::deleteWhere
 --------------------
 
 .. table::
@@ -580,9 +594,9 @@ NodeDao::deleteWhere
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::selectBatch:
+.. _bhenk\msdata\zzz\JoinDao::selectBatch:
 
-NodeDao::selectBatch
+JoinDao::selectBatch
 --------------------
 
 .. table::
@@ -617,9 +631,9 @@ The returned Entity[] array has Entity IDs as keys.
 ----
 
 
-.. _bhenk\msdata\node\NodeDao::selectWhere:
+.. _bhenk\msdata\zzz\JoinDao::selectWhere:
 
-NodeDao::selectWhere
+JoinDao::selectWhere
 --------------------
 
 .. table::

@@ -47,12 +47,12 @@ EntityInterface
    :widths: auto
    :align: left
 
-   ===================== ====================================================================================================================================== 
-   namespace             bhenk\\msdata\\abc                                                                                                                     
-   predicates            Abstract | Interface                                                                                                                   
-   implements            `Stringable <https://www.php.net/manual/en/class.stringable.php>`_                                                                     
-   known implementations :ref:`bhenk\msdata\abc\Entity` | :ref:`bhenk\msdata\node\NodeDo` | :ref:`bhenk\msdata\user\PersonDo` | :ref:`bhenk\msdata\user\UserDo` 
-   ===================== ====================================================================================================================================== 
+   ===================== ===================================================================================================================================================================== 
+   namespace             bhenk\\msdata\\abc                                                                                                                                                    
+   predicates            Abstract | Interface                                                                                                                                                  
+   implements            `Stringable <https://www.php.net/manual/en/class.stringable.php>`_                                                                                                    
+   known implementations :ref:`bhenk\msdata\abc\Entity` | :ref:`bhenk\msdata\abc\Join` | :ref:`bhenk\msdata\node\NodeDo` | :ref:`bhenk\msdata\user\PersonDo` | :ref:`bhenk\msdata\user\UserDo` 
+   ===================== ===================================================================================================================================================================== 
 
 
 **Definition of a basic data object**
@@ -291,4 +291,4 @@ EntityInterface::__toString
 
 ----
 
-:block:`Sat, 08 Apr 2023 09:06:57 +0000` 
+:block:`Sat, 08 Apr 2023 17:52:22 +0000` 
