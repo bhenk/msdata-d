@@ -10,6 +10,7 @@ use bhenk\msdata\node\NodeDao;
 use bhenk\msdata\node\NodeDo;
 use Exception;
 use PHPUnit\Framework\TestCase;
+use function array_values;
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertInstanceOf;
@@ -133,9 +134,10 @@ class AbstractDaoTest extends TestCase {
         $dao = new NodeDao();
         $batch2 = $dao->insertBatch($batch);
 
-        $batch2[0]->setName("altered name 1");
-        $batch2[1]->setAlias("altered alias 2");
-        $batch2[2]->setPublic(true);
+        $b_vals = array_values($batch2);
+        $b_vals[0]->setName("altered name 1");
+        $b_vals[1]->setAlias("altered alias 2");
+        $b_vals[2]->setPublic(true);
 
         $result = $dao->updateBatch($batch2);
         assertEquals(3, $result);
@@ -151,7 +153,8 @@ class AbstractDaoTest extends TestCase {
         $dao = new NodeDao();
         $batch2 = $dao->insertBatch($batch);
 
-        $delete_batch = [$batch2[1]->getID(), $batch2[2]->getID()];
+        $b_vals = array_values($batch2);
+        $delete_batch = [$b_vals[1]->getID(), $b_vals[2]->getID()];
         $num_rows = $dao->deleteBatch($delete_batch);
         assertEquals(2, $num_rows);
     }
@@ -228,7 +231,7 @@ class AbstractDaoTest extends TestCase {
         $where_clause = "name='xyz'";
         $selected = $dao->selectWhere($where_clause);
         assertTrue(count($selected) >= 2);
-        assertInstanceOf(NodeDo::class, $selected[0]);
+        assertInstanceOf(NodeDo::class, array_values($selected)[0]);
     }
 
 }

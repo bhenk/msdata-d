@@ -390,7 +390,7 @@ AbstractDao::insertBatch
 
 The :tech:`ID` of the :ref:`Entities <bhenk\msdata\abc\Entity>` (if any) will be ignored. Returns an array of
 Entities equal to the
-given Entities with new :tech:`ID`\ s.
+given Entities with new :tech:`ID`\ s and ID as array key.
 
 
 
@@ -531,6 +531,10 @@ AbstractDao::selectBatch
 **Select Entities with the given IDs**
 
 
+The returned Entity[] array has Entity IDs as keys.
+
+
+
 .. code-block:: php
 
    public function selectBatch(
@@ -569,6 +573,8 @@ AbstractDao::selectWhere
    SELECT FROM %table_name% WHERE %expression%
 
 
+The returned Entity[] array has Entity IDs as keys.
+
 
 
 .. code-block:: php
@@ -585,4 +591,4 @@ AbstractDao::selectWhere
 
 ----
 
-:block:`Tue, 04 Apr 2023 13:37:54 +0000` 
+:block:`Sat, 08 Apr 2023 09:06:57 +0000` 

@@ -11,6 +11,7 @@ use Throwable;
 use function array_reverse;
 use function array_slice;
 use function array_values;
+use function count;
 use function is_null;
 use function mysqli_report;
 use function rtrim;
@@ -133,7 +134,8 @@ abstract class AbstractDao {
      * @throws Exception code 201
      */
     public function insert(Entity $entity): Entity {
-        return $this->insertBatch([$entity])[0];
+        $inserted = $this->insertBatch([$entity]);
+        return array_values($inserted)[0];
     }
 
     /**
@@ -167,7 +169,7 @@ abstract class AbstractDao {
      */
     public function select(int $ID): ?Entity {
         $selected = $this->selectBatch([$ID]);
-        return (count($selected) == 1) ? $selected[0] : null;
+        return (count($selected) == 1) ? array_values($selected)[0] : null;
     }
 
     /**
@@ -175,10 +177,10 @@ abstract class AbstractDao {
      *
      * The :tech:`ID` of the {@link Entity Entities} (if any) will be ignored. Returns an array of
      * Entities equal to the
-     * given Entities with new :tech:`ID`\ s.
+     * given Entities with new :tech:`ID`\ s and ID as array key.
      *
-     * @param array $entity_array array of Entities to insert
-     * @return array array of Entities with new :tech:`ID`\ s
+     * @param Entity[] $entity_array array of Entities to insert
+     * @return Entity[] array of Entities with new :tech:`ID`\ s
      * @throws Exception code 201
      */
     public function insertBatch(array $entity_array): array {
@@ -190,13 +192,12 @@ abstract class AbstractDao {
             $row_count = 0;
             $conn = MysqlConnector::get()->getConnector();
             $stmt = $conn->prepare($sql);
-            /** @var Entity $entity */
             foreach ($entity_array as $entity) {
                 $arr = $entity->toArray();
                 $result = $stmt->execute(array_slice(array_values($arr), 1));
                 if ($result) {
                     $ID = $stmt->insert_id;
-                    $new_entities[] = $entity->clone($ID);
+                    $new_entities[$ID] = $entity->clone($ID);
                     Log::debug("Inserted " . $entity::class . ", ID = " . $ID);
                     $row_count += $stmt->affected_rows;
                 } else {
@@ -217,19 +218,19 @@ abstract class AbstractDao {
     /**
      * Update the Entities in the given array
      *
-     * @param array $entity_array array of persisted Entities to update
+     * @param Entity[] $entity_array array of persisted Entities to update
      * @return int rows affected
      * @throws Exception code 202
      */
     public function updateBatch(array $entity_array): int {
         $sql = $this->getPrepareUpdateStatement();
+        // UPDATE tbl_name SET field1=?, field2=?, (...), WHERE ID=?
         $stmt = null;
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         try {
             $row_count = 0;
             $conn = MysqlConnector::get()->getConnector();
             $stmt = $conn->prepare($sql);
-            /** @var Entity $entity */
             foreach ($entity_array as $entity) {
                 $arr = $entity->toArray();
                 $update = array_slice(array_values($arr), 1);
@@ -254,7 +255,7 @@ abstract class AbstractDao {
     /**
      * Delete rows with the given IDs
      *
-     * @param array $ids array with IDs of persisted entities
+     * @param int[] $ids array with IDs of persisted entities
      * @return int affected rows
      * @throws Exception code 203
      */
@@ -307,8 +308,10 @@ abstract class AbstractDao {
     /**
      * Select Entities with the given IDs
      *
-     * @param array $ids array of IDs of persisted Entities
-     * @return array array of Entities or empty array if none found
+     * The returned Entity[] array has Entity IDs as keys.
+     *
+     * @param int[] $ids array of IDs of persisted Entities
+     * @return Entity[] array of Entities or empty array if none found
      * @throws Exception code 204
      */
     public function selectBatch(array $ids): array {
@@ -326,7 +329,8 @@ abstract class AbstractDao {
             $stmt->execute($ids);
             $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) {
-                $selected[] = $do::fromArray($row);
+                $entity = $do::fromArray($row);
+                $selected[$entity->getID()] = $entity;
                 $row_count++;
             }
             Log::debug("SELECT row count: " . $row_count);
@@ -344,8 +348,10 @@ abstract class AbstractDao {
      * ```
      * SELECT FROM %table_name% WHERE %expression%
      * ```
+     * The returned Entity[] array has Entity IDs as keys.
+     *
      * @param string $where_clause expression
-     * @return array array of Entities or empty array if none found
+     * @return Entity[] array of Entities or empty array if none found
      * @throws Exception code 204
      */
     public function selectWhere(string $where_clause): array {
@@ -361,7 +367,8 @@ abstract class AbstractDao {
             $conn = MysqlConnector::get()->getConnector();
             $result = $conn->query($sql);
             while ($row = $result->fetch_assoc()) {
-                $selected[] = $do::fromArray($row);
+                $entity = $do::fromArray($row);
+                $selected[$entity->getID()] = $entity;
                 $row_count++;
             }
             Log::debug("SELECT row count: " . $row_count);

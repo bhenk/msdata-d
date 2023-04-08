@@ -5,6 +5,7 @@ namespace connector;
 use bhenk\logger\unit\ConsoleLoggerTrait;
 use bhenk\logger\unit\LogAttribute;
 use bhenk\msdata\connector\MysqlConnector;
+use Exception;
 use mysqli;
 use PHPUnit\Framework\TestCase;
 use function PHPUnit\Framework\assertInstanceOf;
@@ -17,7 +18,6 @@ class MysqlConnectorTest extends TestCase {
 
     public function tearDown(): void {
         MysqlConnector::closeConnection();
-
         parent::tearDown();
     }
 

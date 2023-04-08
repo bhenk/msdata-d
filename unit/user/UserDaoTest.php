@@ -7,6 +7,7 @@ use bhenk\logger\unit\LogAttribute;
 use bhenk\msdata\user\UserDao;
 use bhenk\msdata\user\UserDo;
 use PHPUnit\Framework\TestCase;
+use function array_values;
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertGreaterThanOrEqual;
 use function PHPUnit\Framework\assertStringStartsWith;
@@ -35,8 +36,9 @@ class UserDaoTest extends TestCase {
         ];
         $dao = new UserDao();
         $batch2 = $dao->insertBatch($batch);
-        assertEquals("Bob", $batch2[0]->getFirstName());
-        assertEquals("Presley", $batch2[1]->getLastName());
+        $b_vals = array_values($batch2);
+        assertEquals("Bob", $b_vals[0]->getFirstName());
+        assertEquals("Presley", $b_vals[1]->getLastName());
     }
 
 }
