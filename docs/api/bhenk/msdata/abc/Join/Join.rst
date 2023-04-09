@@ -97,12 +97,14 @@ Join::__construct
          Parameter #0 [ <optional> ?int $ID = NULL ]
          Parameter #1 [ <optional> ?int $FK_LEFT = NULL ]
          Parameter #2 [ <optional> ?int $FK_RIGHT = NULL ]
+         Parameter #3 [ <optional> bool $deleted = false ]
     )
 
 
 | :tag5:`param` ?\ int :param:`$ID` - ID of this Join
 | :tag5:`param` ?\ int :param:`$FK_LEFT` - the left hand foreign key
 | :tag5:`param` ?\ int :param:`$FK_RIGHT` - the right hand foreign key
+| :tag5:`param` bool :param:`$deleted` - false on this location
 
 
 ----
@@ -226,6 +228,65 @@ Join::setFkRight
 
 
 | :tag6:`param` ?\ int :param:`$FK_RIGHT`
+| :tag6:`return` void
+
+
+----
+
+
+.. _bhenk\msdata\abc\Join::isDeleted:
+
+Join::isDeleted
+---------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ========== ====== 
+   predicates public 
+   ========== ====== 
+
+
+**Get whether this join-relation is deleted**
+
+
+.. code-block:: php
+
+   public function isDeleted(): bool
+
+
+| :tag6:`return` bool
+
+
+----
+
+
+.. _bhenk\msdata\abc\Join::setDeleted:
+
+Join::setDeleted
+----------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ========== ====== 
+   predicates public 
+   ========== ====== 
+
+
+**Sets whether this join-relation is deleted**
+
+
+.. code-block:: php
+
+   public function setDeleted(
+         Parameter #0 [ <required> bool $deleted ]
+    ): void
+
+
+| :tag6:`param` bool :param:`$deleted`
 | :tag6:`return` void
 
 
@@ -627,4 +688,4 @@ Join::__toString
 
 ----
 
-:block:`Sat, 08 Apr 2023 17:57:52 +0000` 
+:block:`Sun, 09 Apr 2023 10:39:07 +0000` 

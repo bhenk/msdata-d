@@ -158,13 +158,25 @@ abstract class AbstractDao {
      *
      * The :tech:`ID` of the {@link Entity Entities} (if any) will be ignored. Returns an array of
      * Entities equal to the
-     * given Entities with new :tech:`ID`\ s and ID as array key.
+     * given Entities with new :tech:`ID`\ s and ID as array key. This default behaviour can be altered by
+     * providing a closure that receives each inserted entity and decides what key will be returned:
+     * ```
+     * $func = function(Entity $entity): int {
+     *     return  $entity->getID();
+     * };
+     * ```
      *
      * @param Entity[] $entity_array array of Entities to insert
+     * @param Closure|null $func function to assign key in the returned array
      * @return Entity[] array of Entities with new :tech:`ID`\ s
      * @throws Exception code 201
      */
-    public function insertBatch(array $entity_array): array {
+    public function insertBatch(array $entity_array, Closure $func = null): array {
+        if (is_null($func)) {
+            $func = function (Entity $entity): int {
+                return $entity->getID();
+            };
+        }
         $sql = $this->getPrepareInsertStatement();
         $new_entities = [];
         $stmt = null;
@@ -178,7 +190,8 @@ abstract class AbstractDao {
                 $result = $stmt->execute(array_slice(array_values($arr), 1));
                 if ($result) {
                     $ID = $stmt->insert_id;
-                    $new_entities[$ID] = $entity->clone($ID);
+                    $new_entity = $entity->clone($ID);
+                    $new_entities[$func($new_entity)] = $new_entity;
                     Log::debug("Inserted " . $entity::class . ", ID = " . $ID);
                     $row_count += $stmt->affected_rows;
                 } else {
@@ -196,6 +209,9 @@ abstract class AbstractDao {
         }
     }
 
+    /**
+     * @throws ReflectionException
+     */
     private function getPrepareInsertStatement(): string {
         // INSERT INTO tbl_node (parent_id, name, alias, nature) VALUES (?, ?, ?, ?)
         $s1 = /** @lang text */

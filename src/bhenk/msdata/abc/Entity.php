@@ -64,7 +64,7 @@ class Entity implements EntityInterface {
      * returned array = [Entity-Reflection, A-Reflection, B-Reflection]
      * ```
      *
-     * @return array array with {@link ReflectionClass} parents and this Entity
+     * @return ReflectionClass[] array with {@link ReflectionClass} parents and this Entity
      */
     public function getParents(): array {
         $parents = [];

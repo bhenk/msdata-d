@@ -15,11 +15,13 @@ class Join extends Entity {
      * @param int|null $ID ID of this Join
      * @param int|null $FK_LEFT the left hand foreign key
      * @param int|null $FK_RIGHT the right hand foreign key
+     * @param bool $deleted false on this location
      */
     function __construct(
         ?int         $ID = null,
         private ?int $FK_LEFT = null,
-        private ?int $FK_RIGHT = null
+        private ?int $FK_RIGHT = null,
+        private bool $deleted = false
     ) {
         parent::__construct($ID);
     }
@@ -58,6 +60,22 @@ class Join extends Entity {
      */
     public function setFkRight(?int $FK_RIGHT): void {
         $this->FK_RIGHT = $FK_RIGHT;
+    }
+
+    /**
+     * Get whether this join-relation is deleted
+     * @return bool
+     */
+    public function isDeleted(): bool {
+        return $this->deleted;
+    }
+
+    /**
+     * Sets whether this join-relation is deleted
+     * @param bool $deleted
+     */
+    public function setDeleted(bool $deleted): void {
+        $this->deleted = $deleted;
     }
 
 }

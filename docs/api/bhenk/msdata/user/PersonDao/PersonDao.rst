@@ -268,7 +268,16 @@ PersonDao::insertBatch
 
 The :tech:`ID` of the `Entity <https://www.google.com/search?q=Entity>`_ (if any) will be ignored. Returns an array of
 Entities equal to the
-given Entities with new :tech:`ID`\ s and ID as array key.
+given Entities with new :tech:`ID`\ s and ID as array key. This default behaviour can be altered by
+providing a closure that receives each inserted entity and decides what key will be returned:
+
+..  code-block::
+
+   $func = function(Entity $entity): int {
+       return  $entity->getID();
+   };
+
+
 
 
 
@@ -276,10 +285,12 @@ given Entities with new :tech:`ID`\ s and ID as array key.
 
    public function insertBatch(
          Parameter #0 [ <required> array $entity_array ]
+         Parameter #1 [ <optional> ?Closure $func = NULL ]
     ): array
 
 
 | :tag6:`param` array :param:`$entity_array` - array of Entities to insert
+| :tag6:`param` ?\ `Closure <https://www.php.net/manual/en/class.closure.php>`_ :param:`$func` - function to assign key in the returned array
 | :tag6:`return` array  - array of Entities with new :tech:`ID`\ s
 | :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 201
 
@@ -585,4 +596,4 @@ Default: the returned Entity[] array has Entity IDs as keys.
 
 ----
 
-:block:`Sat, 08 Apr 2023 17:57:52 +0000` 
+:block:`Sun, 09 Apr 2023 10:39:07 +0000` 
