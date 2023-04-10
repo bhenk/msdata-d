@@ -64,7 +64,9 @@ The corresponding Data Object is envisaged to extend :ref:`bhenk\msdata\abc\Join
 .. image:: /img/join.svg
    :alt: symmetric join relation
 
-The relationship is symmetric. A Join with the field *$deleted* set to true will be deleted on any call to
+The relationship is symmetric.
+
+A Join with the field *$deleted* set to true will be deleted on any call to
 :ref:`bhenk\msdata\abc\AbstractJoinDao::updateLeftJoin` or :ref:`bhenk\msdata\abc\AbstractJoinDao::updateRightJoin`.
 
 
@@ -759,4 +761,4 @@ Default: the returned Entity[] array has Entity IDs as keys.
 
 ----
 
-:block:`Sun, 09 Apr 2023 10:39:07 +0000` 
+:block:`Mon, 10 Apr 2023 09:33:24 +0000` 

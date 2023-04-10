@@ -1,6 +1,8 @@
 Usage
 =====
 
+.. contents::
+
 Installation
 ++++++++++++
 
@@ -26,7 +28,7 @@ Creation of tables
 Data types *string*, *int*, *bool* and *float*, when used in Entities will
 be converted to proper database types automatically. Caveat: String is
 converted to *VARCHAR(255)*. If your strings are larger you'll have to
-override the method :ref:`bhenk\msdata\abc\AbstractDao::getCreateTableStatement` with
+override the method :ref:`bhenk\msdata\abc\AbstractDao::getCreateTableStatement` and provide
 your own.
 
 Simple Data Objects
@@ -52,3 +54,29 @@ though they may be represented in the database with appropriate types
 and queried as such, and in your business layer again as
 `DateTimeImmutable(s) <https://www.php.net/manual/en/class.datetimeimmutable.php>`_
 etc.
+
+Relations
+---------
+
+The Data Access Object :ref:`bhenk\msdata\abc\AbstractJoinDao` and Data Object :ref:`bhenk\msdata\abc\Join` can be
+used to express many-to-many relationships, based on a join-table with foreign keys. Below is a complete diagram
+covering database, data-layer and business-layer.
+
+.. image:: /img/many_to_many.svg
+   :alt: Many-to-many relationship over 3 layers
+
+Business Objects (Bo's) are created by their corresponding Store Object. Store Objects rely on their
+Data Access Object (Dao) to materialize the type of Bo. Bo's have a dependency on their
+Relations Object  which in turn has a dependency on the opposite Store Object, in order to materialize the
+opposite ends of the relation. Relations Objects may have lazy methods to fetch their (Join) Data Objects and
+related Bo's, in order to keep database traffic at a minimum.
+
+After a Store Object has persisted a Bo, it calls on the Relations Object to persist the relations.
+
+A Relations Object may keep track of more than one type of relation, so Bo's can have multiple relations
+to multiple other Bo-types.
+
+Although there are no objections to complete symmetry, adding and removing of relations is often done
+from one side only, while the other side has readonly methods on their Relations Object. So for
+instance a Person can add and remove Addresses, while from the Address Object you can only obtain which
+Persons are living there.

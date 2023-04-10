@@ -15,7 +15,9 @@ use function is_null;
  * .. image:: /img/join.svg
  *    :alt: symmetric join relation
  *
- * The relationship is symmetric. A Join with the field *$deleted* set to true will be deleted on any call to
+ * The relationship is symmetric.
+ *
+ * A Join with the field *$deleted* set to true will be deleted on any call to
  * {@link AbstractJoinDao::updateLeftJoin()} or {@link AbstractJoinDao::updateRightJoin()}.
  */
 abstract class AbstractJoinDao extends AbstractDao {
