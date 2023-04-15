@@ -23,7 +23,7 @@ use function PHPUnit\Framework\assertTrue;
 class AbstractDaoTest extends TestCase {
     use ConsoleLoggerTrait;
 
-    #[LogAttribute(true)]
+    #[LogAttribute(false)]
     public function testCreateTableStatement() {
         $dao = new NodeDao();
         $sql = $dao->getCreateTableStatement();
@@ -110,7 +110,7 @@ class AbstractDaoTest extends TestCase {
         assertTrue($thrown);
     }
 
-    #[LogAttribute(true)]
+    #[LogAttribute(false)]
     public function testUpdate(): void {
         $node = new NodeDo(null, 12, "node name", "node alias", "node nature");
         $dao = new NodeDao();

@@ -5,6 +5,8 @@ namespace connector;
 use bhenk\logger\unit\ConsoleLoggerTrait;
 use bhenk\logger\unit\LogAttribute;
 use bhenk\msdata\connector\MysqlConnector;
+use bhenk\msdata\node\NodeDao;
+use Exception;
 use mysqli;
 use PHPUnit\Framework\TestCase;
 use function PHPUnit\Framework\assertInstanceOf;
@@ -20,7 +22,7 @@ class MysqlConnectorTest extends TestCase {
         parent::tearDown();
     }
 
-    #[LogAttribute(true)]
+    #[LogAttribute(false)]
     public function testConnection() {
         $mysql = MysqlConnector::get();
         assertInstanceOf(MysqlConnector::class, $mysql);
@@ -88,5 +90,15 @@ class MysqlConnectorTest extends TestCase {
 //        }
 //        assertTrue($ex_thrown);
 //    }
+
+    /**
+     * @throws Exception
+     */
+    #[LogAttribute]
+    public function testGetServerInfo() {
+        $mysql = MysqlConnector::get();
+        self::assertStringContainsStringIgnoringCase(".", $mysql->connectionInfo());
+        $mysql->statusInfo();
+    }
 
 }

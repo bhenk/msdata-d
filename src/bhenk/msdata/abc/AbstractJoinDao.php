@@ -34,7 +34,7 @@ abstract class AbstractJoinDao extends AbstractDao {
         $callback = function (Join $join): int {
             return $join->getFkRight();
         };
-        return parent::selectWhere($where, $callback);
+        return parent::selectWhere($where, 0, PHP_INT_MAX, $callback);
     }
 
     /**
@@ -49,7 +49,7 @@ abstract class AbstractJoinDao extends AbstractDao {
         $callback = function (Join $join): int {
             return $join->getFkLeft();
         };
-        return parent::selectWhere($where, $callback);
+        return parent::selectWhere($where, 0, PHP_INT_MAX, $callback);
     }
 
     /**

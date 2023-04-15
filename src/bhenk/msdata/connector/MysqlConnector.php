@@ -10,6 +10,7 @@ use function dirname;
 use function get_class;
 use function is_dir;
 use function is_file;
+use function mysqli_get_client_info;
 
 /**
  * Static wrapper around a mysqli instance
@@ -25,7 +26,7 @@ use function is_file;
  * ```
  * {ancestor directory}/config/msd_config.php
  * ```
- * The configuration file returns configuration options as an array:
+ * The configuration file should return configuration options as an array:
  * ```
  * <?php
  *
@@ -91,6 +92,8 @@ class MysqlConnector {
     /**
      * Get the (absolute path to the) configuration file
      *
+     * @see MysqlConnector::getConfiguration()
+     *
      * @return bool|string absolute path to configuration file or *false* if not set
      */
     public function getConfigFile(): bool|string {
@@ -107,6 +110,30 @@ class MysqlConnector {
      */
     public function setConfigFile(bool|string $config_file): void {
         $this->config_file = $config_file;
+    }
+
+    /**
+     * Returns status info
+     *
+     * Something like
+     * ```
+     * Uptime: 80984
+     * Threads: 2
+     * Questions: 1327
+     * Slow queries: 0
+     * Opens: 432
+     * Flush tables: 3
+     * Open tables: 274
+     * Queries per second avg: 0.016"
+     * ```
+     * @return bool|string a string describing the server status, *false* if an error occurred
+     * @throws Exception
+     */
+    public function statusInfo(): bool|string {
+        $conn = $this->getConnector();
+        $stat = $conn->stat();
+        Log::info("Status info: ", [$stat]);
+        return $stat;
     }
 
     /**
@@ -175,21 +202,6 @@ class MysqlConnector {
     }
 
     /**
-     * @throws Exception
-     */
-    private function validateConfiguration(array $config): void {
-        $args = ["hostname", "username", "password", "database"];
-        foreach ($args as $arg) {
-            if (!isset($config[$arg])) {
-                $msg = "'$arg' not found in configuration for " . get_class($this)
-                    . " in configuration file " . $this->config_file;
-                Log::alert($msg);
-                throw new Exception($msg);
-            }
-        }
-    }
-
-    /**
      * @return array
      * @throws Exception
      */
@@ -222,6 +234,47 @@ class MysqlConnector {
         $msg = "Configuration directory '" . self::CONFIG_DIR . "' not found";
         Log::alert($msg);
         throw new Exception($msg);
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function validateConfiguration(array $config): void {
+        $args = ["hostname", "username", "password", "database"];
+        foreach ($args as $arg) {
+            if (!isset($config[$arg])) {
+                $msg = "'$arg' not found in configuration for " . get_class($this)
+                    . " in configuration file " . $this->config_file;
+                Log::alert($msg);
+                throw new Exception($msg);
+            }
+        }
+    }
+
+    /**
+     * Returns client and server info
+     *
+     * Something like
+     * ```
+     * client: mysqlnd 8.2.1
+     * server: 8.0.32
+     * host: 127.0.0.1 via TCP/IP
+     * protocol version: 10
+     * character set: utf8mb4
+     * ```
+     *
+     * @return string client and server info
+     * @throws Exception
+     */
+    public function connectionInfo(): string {
+        $conn = $this->getConnector();
+        $info = "client: " . mysqli_get_client_info()
+            . " - server: " . $conn->get_server_info()
+            . " - host: " . $conn->host_info
+            . " - protocol version: " . $conn->protocol_version
+            . " - character set: " . $conn->character_set_name();
+        Log::info("Connection info: ", [$info]);
+        return $info;
     }
 
 }

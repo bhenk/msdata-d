@@ -649,7 +649,7 @@ NodeDao::selectWhere
 
 ..  code-block::
 
-   SELECT FROM %table_name% WHERE %expression%
+   SELECT FROM %table_name% WHERE %expression% LIMIT %offset%, %limit%;
 
 
 The optional :tagsign:`param` :tech:`$func` receives selected Entities and can decide what key
@@ -670,11 +670,15 @@ Default: the returned Entity[] array has Entity IDs as keys.
 
    public function selectWhere(
          Parameter #0 [ <required> string $where_clause ]
-         Parameter #1 [ <optional> ?Closure $func = NULL ]
+         Parameter #1 [ <optional> int $offset = 0 ]
+         Parameter #2 [ <optional> int $limit = bhenk\msdata\abc\PHP_INT_MAX ]
+         Parameter #3 [ <optional> ?Closure $func = NULL ]
     ): array
 
 
 | :tag6:`param` string :param:`$where_clause` - expression
+| :tag6:`param` int :param:`$offset` - offset of the first row to return
+| :tag6:`param` int :param:`$limit` - the maximum number of rows to return
 | :tag6:`param` ?\ `Closure <https://www.php.net/manual/en/class.closure.php>`_ :param:`$func` - if given decides which keys the returned array will have
 | :tag6:`return` array  - array of Entities or empty array if none found
 | :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 204
@@ -682,4 +686,4 @@ Default: the returned Entity[] array has Entity IDs as keys.
 
 ----
 
-:block:`Mon, 10 Apr 2023 09:33:24 +0000` 
+:block:`Sat, 15 Apr 2023 09:22:29 +0000` 

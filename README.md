@@ -51,3 +51,31 @@ or other primitive types,
 though they may be represented in the database with appropriate types
 and queried as such. 
 
+### Relations
+The Data Access Object 
+[AbstractJoinDao](https://bhenkmsdata.readthedocs.io/en/latest/api/bhenk/msdata/abc/AbstractJoinDao/AbstractJoinDao.html#abstractjoindao)
+and Data Object 
+[Join](https://bhenkmsdata.readthedocs.io/en/latest/api/bhenk/msdata/abc/Join/Join.html#join)
+can be used to express many-to-many relationships, based on a join-table with foreign keys. 
+Below is a complete diagram covering database, data-layer and business-layer.
+
+![Many-to-many relationship over 3 layers](docs/img/many_to_many.svg)
+
+Business Objects (Bo’s) are created by their corresponding Store Object. 
+Store Objects rely on their Data Access Object (Dao) to materialize the type of Bo. 
+Bo’s have a dependency on their Relations Object which in turn has a dependency on 
+the opposite Store Object, in order to materialize the opposite ends of the relation. 
+Relations Objects may have lazy methods to fetch their (Join) Data Objects and 
+related Bo’s, in order to keep database traffic at a minimum.
+
+After a Store Object has persisted a Bo, it calls on the Relations Object to 
+persist the relations.
+
+A Relations Object may keep track of more than one type of relation, so Bo’s can have 
+multiple relations to multiple other Bo-types. For each type of relation the Relations 
+Object than has distinguished Dao’s and Do’s, backed by separate join tables.
+
+Although there are no objections to complete symmetry, adding and removing of relations 
+is often done from one side only, while the other side has readonly methods on their 
+Relations Object. So for instance a Person can add and remove Addresses, while from 
+the Address Object you can only obtain which Persons are living or working there.

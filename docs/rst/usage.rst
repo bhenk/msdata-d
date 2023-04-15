@@ -74,9 +74,10 @@ related Bo's, in order to keep database traffic at a minimum.
 After a Store Object has persisted a Bo, it calls on the Relations Object to persist the relations.
 
 A Relations Object may keep track of more than one type of relation, so Bo's can have multiple relations
-to multiple other Bo-types.
+to multiple other Bo-types. For each type of relation the Relations Object than has distinguished Dao's and Do's,
+backed by separate join tables.
 
 Although there are no objections to complete symmetry, adding and removing of relations is often done
 from one side only, while the other side has readonly methods on their Relations Object. So for
 instance a Person can add and remove Addresses, while from the Address Object you can only obtain which
-Persons are living there.
+Persons are living or working there.

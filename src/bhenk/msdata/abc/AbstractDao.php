@@ -431,7 +431,7 @@ abstract class AbstractDao {
      * Select Entities with a *where-clause*
      *
      * ```
-     * SELECT FROM %table_name% WHERE %expression%
+     * SELECT FROM %table_name% WHERE %expression% LIMIT %offset%, %limit%;
      * ```
      * The optional {@link $func} receives selected Entities and can decide what key
      * the Entity will have in the returned Entity[] array.
@@ -443,18 +443,24 @@ abstract class AbstractDao {
      * ```
      *
      * @param string $where_clause expression
+     * @param int $offset offset of the first row to return
+     * @param int $limit the maximum number of rows to return
      * @param Closure|null $func if given decides which keys the returned array will have
      * @return Entity[] array of Entities or empty array if none found
      * @throws Exception code 204
      */
-    public function selectWhere(string $where_clause, Closure $func = null): array {
+    public function selectWhere(string  $where_clause,
+                                int     $offset = 0,
+                                int     $limit = PHP_INT_MAX,
+                                Closure $func = null): array {
         if (is_null($func)) {
             $func = function (Entity $entity): int {
                 return $entity->getID();
             };
         }
         $sql = /** @lang text */
-            "SELECT * FROM `" . $this->getTableName() . "` WHERE " . $where_clause;
+            "SELECT * FROM `" . $this->getTableName() . "` WHERE " . $where_clause
+            . " LIMIT " . $offset . "," . $limit . ";";
         Log::debug($sql);
         /** @var $do Entity */
         $do = $this->getDataObjectName();

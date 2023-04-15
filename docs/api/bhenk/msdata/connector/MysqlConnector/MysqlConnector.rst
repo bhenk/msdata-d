@@ -70,7 +70,7 @@ a child of an ancestor directory of this code base:
    {ancestor directory}/config/msd_config.php
 
 
-The configuration file returns configuration options as an array:
+The configuration file should return configuration options as an array:
 
 ..  code-block::
 
@@ -242,6 +242,15 @@ MysqlConnector::getConfigFile
 **Get the (absolute path to the) configuration file**
 
 
+
+
+
+
+.. admonition::  see also
+
+    :ref:`bhenk\msdata\connector\MysqlConnector::getConfiguration`
+
+
 .. code-block:: php
 
    public function getConfigFile(): string|bool
@@ -283,6 +292,51 @@ When not using auto-find of configuration, this method must be called before a c
 
 | :tag6:`param` string | bool :param:`$config_file` - absolute path to a configuration file, or *false* when returning to auto-find configuration
 | :tag6:`return` void
+
+
+----
+
+
+.. _bhenk\msdata\connector\MysqlConnector::statusInfo:
+
+MysqlConnector::statusInfo
+--------------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ========== ====== 
+   predicates public 
+   ========== ====== 
+
+
+**Returns status info**
+
+
+Something like
+
+..  code-block::
+
+   Uptime: 80984
+   Threads: 2
+   Questions: 1327
+   Slow queries: 0
+   Opens: 432
+   Flush tables: 3
+   Open tables: 274
+   Queries per second avg: 0.016"
+
+
+
+
+.. code-block:: php
+
+   public function statusInfo(): string|bool
+
+
+| :tag6:`return` string | bool  - a string describing the server status, *false* if an error occurred
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_
 
 
 ----
@@ -397,4 +451,47 @@ MysqlConnector::setConfiguration
 
 ----
 
-:block:`Mon, 10 Apr 2023 09:33:24 +0000` 
+
+.. _bhenk\msdata\connector\MysqlConnector::connectionInfo:
+
+MysqlConnector::connectionInfo
+------------------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ========== ====== 
+   predicates public 
+   ========== ====== 
+
+
+**Returns client and server info**
+
+
+Something like
+
+..  code-block::
+
+   client: mysqlnd 8.2.1
+   server: 8.0.32
+   host: 127.0.0.1 via TCP/IP
+   protocol version: 10
+   character set: utf8mb4
+
+
+
+
+
+.. code-block:: php
+
+   public function connectionInfo(): string
+
+
+| :tag6:`return` string  - client and server info
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_
+
+
+----
+
+:block:`Sat, 15 Apr 2023 09:22:29 +0000` 
