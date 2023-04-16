@@ -314,8 +314,12 @@ NodeDao::insert
 **Insert the given Entity**
 
 
-The :tech:`ID` of the `Entity <https://www.google.com/search?q=Entity>`_ (if any) will be ignored. Returns an Entity equal to the
+With :tagsign:`param` :tech:`$insertID` set to *false* (this is the default), the :tech:`ID` of the `Entity <https://www.google.com/search?q=Entity>`_ (if any)
+will be ignored. Returns an Entity equal to the
 given Entity with the new :tech:`ID`.
+
+In order to be able to reconstruct a table, the :tech:`ID` of the Entity can be inserted as well. Set
+:tagsign:`param` :tech:`$insertID` to *true* to achieve this.
 
 
 
@@ -323,10 +327,12 @@ given Entity with the new :tech:`ID`.
 
    public function insert(
          Parameter #0 [ <required> bhenk\msdata\abc\Entity $entity ]
+         Parameter #1 [ <optional> bool $insertID = false ]
     ): Entity
 
 
 | :tag6:`param` :ref:`bhenk\msdata\abc\Entity` :param:`$entity` - Entity to insert
+| :tag6:`param` bool :param:`$insertID` - should the *primary key* ID also be inserted
 | :tag6:`return` :ref:`bhenk\msdata\abc\Entity`  - new Entity, equal to given one, with new :tech:`ID`
 | :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 201
 
@@ -365,6 +371,9 @@ providing a closure that receives each inserted entity and decides what key will
 
 
 
+In order to be able to reconstruct a table, the ID of the Entities can be inserted as well. Set
+:tagsign:`param` :tech:`$insertID` to *true* to achieve this.
+
 
 
 .. code-block:: php
@@ -372,11 +381,13 @@ providing a closure that receives each inserted entity and decides what key will
    public function insertBatch(
          Parameter #0 [ <required> array $entity_array ]
          Parameter #1 [ <optional> ?Closure $func = NULL ]
+         Parameter #2 [ <optional> bool $insertID = false ]
     ): array
 
 
 | :tag6:`param` array :param:`$entity_array` - array of Entities to insert
 | :tag6:`param` ?\ `Closure <https://www.php.net/manual/en/class.closure.php>`_ :param:`$func` - function to assign key in the returned array
+| :tag6:`param` bool :param:`$insertID` - should the *primary key* ID also be inserted
 | :tag6:`return` array  - array of Entities with new :tech:`ID`\ s
 | :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_  - code 201
 
@@ -686,4 +697,4 @@ Default: the returned Entity[] array has Entity IDs as keys.
 
 ----
 
-:block:`Sat, 15 Apr 2023 09:22:29 +0000` 
+:block:`Sun, 16 Apr 2023 12:16:10 +0000` 

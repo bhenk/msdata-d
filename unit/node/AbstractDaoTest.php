@@ -234,4 +234,23 @@ class AbstractDaoTest extends TestCase {
         assertInstanceOf(NodeDo::class, array_values($selected)[0]);
     }
 
+    #[LogAttribute(false)]
+    public function testInsertWithID() {
+        $batch = [
+            new NodeDo(null, null, "xyz", "alias 1", "nature 1", false),
+            new NodeDo(null, 1, "name 2", "alias 2", "nature 2", true),
+            new NodeDo(null, 2, "xyz", "alias 3", "nature 3", false),
+        ];
+        $dao = new NodeDao();
+        $dao->insertBatch($batch);
+
+        $node = new NodeDo(42, 2, "the answer", "to all questions");
+        $inserted = $dao->insert($node, true);
+        assertEquals(42, $inserted->getID());
+
+        $node = new NodeDo(null, 2, "another", "node");
+        $inserted = $dao->insert($node);
+        assertEquals(43, $inserted->getID());
+    }
+
 }

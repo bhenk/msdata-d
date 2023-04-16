@@ -5,7 +5,6 @@ namespace connector;
 use bhenk\logger\unit\ConsoleLoggerTrait;
 use bhenk\logger\unit\LogAttribute;
 use bhenk\msdata\connector\MysqlConnector;
-use bhenk\msdata\node\NodeDao;
 use Exception;
 use mysqli;
 use PHPUnit\Framework\TestCase;

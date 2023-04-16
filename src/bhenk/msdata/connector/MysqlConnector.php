@@ -92,9 +92,9 @@ class MysqlConnector {
     /**
      * Get the (absolute path to the) configuration file
      *
+     * @return bool|string absolute path to configuration file or *false* if not set
      * @see MysqlConnector::getConfiguration()
      *
-     * @return bool|string absolute path to configuration file or *false* if not set
      */
     public function getConfigFile(): bool|string {
         return $this->config_file;

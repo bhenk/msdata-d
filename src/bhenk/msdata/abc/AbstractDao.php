@@ -141,15 +141,20 @@ abstract class AbstractDao {
     /**
      * Insert the given Entity
      *
-     * The :tech:`ID` of the {@link Entity} (if any) will be ignored. Returns an Entity equal to the
+     * With {@link $insertID} set to *false* (this is the default), the :tech:`ID` of the {@link Entity} (if any)
+     * will be ignored. Returns an Entity equal to the
      * given Entity with the new :tech:`ID`.
      *
+     * In order to be able to reconstruct a table, the :tech:`ID` of the Entity can be inserted as well. Set
+     * {@link $insertID} to *true* to achieve this.
+     *
      * @param Entity $entity Entity to insert
+     * @param bool $insertID should the *primary key* ID also be inserted
      * @return Entity new Entity, equal to given one, with new :tech:`ID`
      * @throws Exception code 201
      */
-    public function insert(Entity $entity): Entity {
-        $inserted = $this->insertBatch([$entity]);
+    public function insert(Entity $entity, bool $insertID = false): Entity {
+        $inserted = $this->insertBatch([$entity], null, $insertID);
         return array_values($inserted)[0];
     }
 
@@ -166,18 +171,23 @@ abstract class AbstractDao {
      * };
      * ```
      *
+     * In order to be able to reconstruct a table, the ID of the Entities can be inserted as well. Set
+     * {@link $insertID} to *true* to achieve this.
+     *
      * @param Entity[] $entity_array array of Entities to insert
      * @param Closure|null $func function to assign key in the returned array
+     * @param bool $insertID should the *primary key* ID also be inserted
      * @return Entity[] array of Entities with new :tech:`ID`\ s
      * @throws Exception code 201
      */
-    public function insertBatch(array $entity_array, Closure $func = null): array {
+    public function insertBatch(array $entity_array, Closure $func = null, bool $insertID = false): array {
+        if (empty($entity_array)) return [];
         if (is_null($func)) {
             $func = function (Entity $entity): int {
                 return $entity->getID();
             };
         }
-        $sql = $this->getPrepareInsertStatement();
+        $sql = $this->getPrepareInsertStatement($insertID);
         $new_entities = [];
         $stmt = null;
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -187,7 +197,8 @@ abstract class AbstractDao {
             $stmt = $conn->prepare($sql);
             foreach ($entity_array as $entity) {
                 $arr = $entity->toArray();
-                $result = $stmt->execute(array_slice(array_values($arr), 1));
+                $offset = $insertID ? 0 : 1;
+                $result = $stmt->execute(array_slice(array_values($arr), $offset));
                 if ($result) {
                     $ID = $stmt->insert_id;
                     $new_entity = $entity->clone($ID);
@@ -210,20 +221,24 @@ abstract class AbstractDao {
     }
 
     /**
+     * @param bool $insertID should *primary key* ID also be inserted
+     * @return string the prepare insert statement
      * @throws ReflectionException
      */
-    private function getPrepareInsertStatement(): string {
-        // INSERT INTO tbl_node (parent_id, name, alias, nature) VALUES (?, ?, ?, ?)
+    private function getPrepareInsertStatement(bool $insertID = false): string {
+        // INSERT INTO tbl_node ([ID], parent_id, name, alias, nature) VALUES (?, ?, ?, ?)
         $s1 = /** @lang text */
             "INSERT INTO " . $this->getTableName() . " (";
         $s2 = ") VALUES (";
+        $ID_passed = false;
         foreach ($this->getDoParents() as $parent) {
             foreach ($parent->getProperties() as $prop) {
                 $name = $prop->getName();
-                if ($name != "ID") {
+                if ($name != "ID" or ($insertID and !$ID_passed)) {
                     $s1 .= $name . ", ";
                     $s2 .= "?, ";
                 }
+                if ($name == "ID") $ID_passed = true;
             }
         }
         $statement = rtrim($s1, ", ") . rtrim($s2, ", ") . ")";
@@ -250,6 +265,7 @@ abstract class AbstractDao {
      * @throws Exception code 202
      */
     public function updateBatch(array $entity_array): int {
+        if (empty($entity_array)) return 0;
         $sql = $this->getPrepareUpdateStatement();
         // UPDATE tbl_name SET field1=?, field2=?, (...), WHERE ID=?
         $stmt = null;
@@ -317,6 +333,7 @@ abstract class AbstractDao {
      * @throws Exception code 203
      */
     public function deleteBatch(array $ids): int {
+        if (empty($ids)) return 0;
         $sql = $this->getPrepareDeleteStatement(count($ids));
         Log::debug($sql);
         $stmt = null;
@@ -365,6 +382,7 @@ abstract class AbstractDao {
      * @throws Exception code 204
      */
     public function selectBatch(array $ids): array {
+        if (empty($ids)) return [];
         $sql = $this->getPrepareSelectStatement(count($ids));
         Log::debug($sql);
         $stmt = null;
