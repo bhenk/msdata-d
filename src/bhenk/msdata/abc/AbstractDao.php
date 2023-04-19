@@ -41,6 +41,28 @@ use function str_repeat;
 abstract class AbstractDao {
 
     /**
+     * Drop table if it exists
+     *
+     * Tries to drop the table with the name returned by {@link AbstractDao::getTableName()}.
+     *
+     * @return bool *true* on success, even if table does not exist, *false* on failure
+     * @throws Exception
+     */
+    public function dropTable(): bool {
+        $query = /** @lang text */
+            "DROP TABLE IF EXISTS `"
+            . $this->getTableName()
+            . "`;";
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            $conn = MysqlConnector::get()->getConnector();
+            return $conn->query($query);
+        } catch (Throwable $e) {
+            throw new Exception("Could not drop table " . $this->getTableName(), 200, $e);
+        }
+    }
+
+    /**
      * Create a table in the database
      *
      * The statement used is the one from {@link AbstractDao::getCreateTableStatement() getCreateTableStatement}.
@@ -295,6 +317,10 @@ abstract class AbstractDao {
         }
     }
 
+    /**
+     * @return string
+     * @throws ReflectionException
+     */
     private function getPrepareUpdateStatement(): string {
         // UPDATE tbl_name SET parent_id=?, name=?, alias=?, nature=?, public=? WHERE ID=?
         $s1 = /** @lang text */

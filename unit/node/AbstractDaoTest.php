@@ -36,6 +36,10 @@ class AbstractDaoTest extends TestCase {
         $dao = new NodeDao();
         $result = $dao->createTable(true);
         assertEquals(2, $result);
+
+        assertTrue($dao->dropTable());
+        assertTrue($dao->dropTable());
+        $dao->createTable();
     }
 
     #[LogAttribute(false)]
@@ -236,12 +240,14 @@ class AbstractDaoTest extends TestCase {
 
     #[LogAttribute(false)]
     public function testInsertWithID() {
+        $dao = new NodeDao();
+        $dao->createTable(true);
         $batch = [
             new NodeDo(null, null, "xyz", "alias 1", "nature 1", false),
             new NodeDo(null, 1, "name 2", "alias 2", "nature 2", true),
             new NodeDo(null, 2, "xyz", "alias 3", "nature 3", false),
         ];
-        $dao = new NodeDao();
+
         $dao->insertBatch($batch);
 
         $node = new NodeDo(42, 2, "the answer", "to all questions");

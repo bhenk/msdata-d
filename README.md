@@ -37,7 +37,7 @@ with your own.
 msData is on purpose kept simple. There will be one table for each
 Data Object. Data Objects have only primitive types: _string_, _int_, 
 _bool_ and _float_. Extend Entity, create a constructor for all your
-Data Object fields, generate getters and setters and you're basically done.
+Data Object fields, generate getters and setters, and you're basically done.
 The corresponding Data Access Object needs only implementing of two methods:
 [getDataObjectName](https://bhenkmsdata.readthedocs.io/en/latest/api/bhenk/msdata/abc/AbstractDao/AbstractDao.html#abstractdao-getdataobjectname)
 and [getTableName](https://bhenkmsdata.readthedocs.io/en/latest/api/bhenk/msdata/abc/AbstractDao/AbstractDao.html#abstractdao-gettablename).

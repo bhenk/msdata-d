@@ -226,6 +226,40 @@ Side effect: the common :tagsign:`param` :tech:`$fk_right` will be set on all Jo
 ----
 
 
+.. _bhenk\msdata\abc\AbstractJoinDao::dropTable:
+
+AbstractJoinDao::dropTable
+--------------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ============== ============================================== 
+   predicates     public                                         
+   inherited from :ref:`bhenk\msdata\abc\AbstractDao::dropTable` 
+   ============== ============================================== 
+
+
+**Drop table if it exists**
+
+
+Tries to drop the table with the name returned by :ref:`bhenk\msdata\abc\AbstractDao::getTableName`.
+
+
+
+.. code-block:: php
+
+   public function dropTable(): bool
+
+
+| :tag6:`return` bool  - *true* on success, even if table does not exist, *false* on failure
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_
+
+
+----
+
+
 .. _bhenk\msdata\abc\AbstractJoinDao::createTable:
 
 AbstractJoinDao::createTable
@@ -776,4 +810,4 @@ Default: the returned Entity[] array has Entity IDs as keys.
 
 ----
 
-:block:`Sun, 16 Apr 2023 12:16:10 +0000` 
+:block:`Wed, 19 Apr 2023 13:38:08 +0000` 
