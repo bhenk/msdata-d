@@ -18,6 +18,7 @@ use function PHPUnit\Framework\assertNotNull;
 use function PHPUnit\Framework\assertNull;
 use function PHPUnit\Framework\assertStringStartsWith;
 use function PHPUnit\Framework\assertTrue;
+use function var_dump;
 
 #[LogAttribute(false)]
 class AbstractDaoTest extends TestCase {
@@ -257,6 +258,32 @@ class AbstractDaoTest extends TestCase {
         $node = new NodeDo(null, 2, "another", "node");
         $inserted = $dao->insert($node);
         assertEquals(43, $inserted->getID());
+    }
+
+    public function testExecute() {
+        $dao = new NodeDao();
+        $dao->createTable(true);
+        $batch = [
+            new NodeDo(null, null, "xyz", "alias 1", "nature 1", false),
+            new NodeDo(null, 1, "name 2", "alias 2", "nature 2", true),
+            new NodeDo(null, 2, "xyz", "alias 3", "nature 3", false),
+        ];
+
+        $dao->insertBatch($batch);
+
+        $sql = /** @lang text */ "SELECT alias, nature FROM " . $dao->getTableName()
+            . " WHERE name like 'xy%';";
+        $results = $dao->execute($sql);
+        assertEquals(2, count($results));
+        assertEquals("alias 1", $results[0]["alias"]);
+        assertEquals("nature 1", $results[0]["nature"]);
+        assertEquals("alias 3", $results[1]["alias"]);
+        assertEquals("nature 3", $results[1]["nature"]);
+
+        $sql = /** @lang text */
+            "DELETE FROM " . $dao->getTableName() . " WHERE name='xyz';";
+        $results = $dao->execute($sql);
+        assertTrue($results);
     }
 
 }

@@ -731,4 +731,37 @@ Default: the returned Entity[] array has Entity IDs as keys.
 
 ----
 
-:block:`Wed, 19 Apr 2023 13:38:08 +0000` 
+
+.. _bhenk\msdata\node\NodeDao::execute:
+
+NodeDao::execute
+----------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ============== ============================================ 
+   predicates     public                                       
+   inherited from :ref:`bhenk\msdata\abc\AbstractDao::execute` 
+   ============== ============================================ 
+
+
+**Execute the given query**
+
+
+.. code-block:: php
+
+   public function execute(
+         Parameter #0 [ <required> string $sql ]
+    ): array|bool
+
+
+| :tag6:`param` string :param:`$sql`
+| :tag6:`return` array | bool  - result rows in array; bool if result is boolean
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_
+
+
+----
+
+:block:`Mon, 24 Apr 2023 09:02:26 +0000` 

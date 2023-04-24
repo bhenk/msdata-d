@@ -13,6 +13,7 @@ use function array_reverse;
 use function array_slice;
 use function array_values;
 use function count;
+use function is_bool;
 use function is_null;
 use function mysqli_report;
 use function rtrim;
@@ -523,6 +524,30 @@ abstract class AbstractDao {
             return $selected;
         } catch (Throwable $e) {
             throw new Exception("Could not select Entity", 204, $e);
+        }
+    }
+
+    /**
+     * Execute the given query
+     *
+     * @param string $sql
+     * @return array|bool result rows in array; bool if result is boolean
+     * @throws Exception
+     */
+    public function execute(string $sql): array|bool {
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        $results = [];
+        Log::debug($sql);
+        try {
+            $conn = MysqlConnector::get()->getConnector();
+            $result = $conn->query($sql);
+            if (is_bool($result)) return $result;
+            while ($row = $result->fetch_assoc()) {
+                $results[] = $row;
+            }
+            return $results;
+        } catch (Throwable $e) {
+            throw new Exception("Could not execute query", 205, $e);
         }
     }
 

@@ -30,11 +30,12 @@ class UserDaoTest extends TestCase {
     }
 
     public function testInsertBatch() {
+        $dao = new UserDao();
+        $dao->createTable(true);
         $batch = [
             new UserDo(null, "Bob", null, "Dylan", "bob@email.com"),
             new UserDo(null, "Elvis", null, "Presley", "elvis@email.com"),
         ];
-        $dao = new UserDao();
         $batch2 = $dao->insertBatch($batch);
         $b_vals = array_values($batch2);
         assertEquals("Bob", $b_vals[0]->getFirstName());
