@@ -646,6 +646,57 @@ Default: the returned Entity[] array has Entity IDs as keys.
 ----
 
 
+.. _bhenk\msdata\user\UserDao::selectSql:
+
+UserDao::selectSql
+------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ============== ============================================== 
+   predicates     public                                         
+   inherited from :ref:`bhenk\msdata\abc\AbstractDao::selectSql` 
+   ============== ============================================== 
+
+
+**Select Entities with a sql statement**
+
+
+The optional :tagsign:`param` :tech:`$func` receives selected Entities and can decide what key
+the Entity will have in the returned Entity[] array.
+Default: the returned Entity[] array has Entity IDs as keys.
+
+..  code-block::
+
+   $func = function(Entity $entity): int {
+       return  $entity->getID();
+   };
+
+
+If the :tagsign:`param` :tech:`$sql` selects not all fields from the designated table or selects from tables other than
+the designated, the result is unpredictable.
+
+
+
+.. code-block:: php
+
+   public function selectSql(
+         Parameter #0 [ <required> string $sql ]
+         Parameter #1 [ <optional> ?Closure $func = NULL ]
+    ): array
+
+
+| :tag6:`param` string :param:`$sql` - sql selecting all fields from designated table
+| :tag6:`param` ?\ `Closure <https://www.php.net/manual/en/class.closure.php>`_ :param:`$func` - if given decides which keys the returned array will have
+| :tag6:`return` array  - array of Entities or empty array if none found
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_
+
+
+----
+
+
 .. _bhenk\msdata\user\UserDao::execute:
 
 UserDao::execute
@@ -678,4 +729,4 @@ UserDao::execute
 
 ----
 
-:block:`Mon, 24 Apr 2023 09:02:26 +0000` 
+:block:`Mon, 01 May 2023 14:39:48 +0000` 

@@ -212,6 +212,7 @@ class AbstractDaoTest extends TestCase {
     #[LogAttribute(false)]
     public function testSelect() {
         $dao = new NodeDao();
+        $dao->createTable();
         $node = $dao->insert(new NodeDo(null));
         $ID = $node->getID();
 
@@ -258,6 +259,26 @@ class AbstractDaoTest extends TestCase {
         $node = new NodeDo(null, 2, "another", "node");
         $inserted = $dao->insert($node);
         assertEquals(43, $inserted->getID());
+    }
+
+    public function testSelectSql() {
+        $dao = new NodeDao();
+        $dao->createTable(true);
+        $batch = [
+            new NodeDo(null, null, "xyz", "alias 1", "nature 1", false),
+            new NodeDo(null, 1, "name 2", "alias 2", "nature 2", true),
+            new NodeDo(null, 2, "xyz", "alias 3", "nature 3", false),
+            new NodeDo(null, 3, "xyz", "alias 4", "nature 4", false),
+        ];
+        $dao->insertBatch($batch);
+
+        $sql = /** @lang text */
+            "SELECT * FROM " . $dao->getTableName() . " WHERE name='xyz' ORDER BY parent_id DESC LIMIT 1, 2;";
+        $nodes = $dao->selectSql($sql);
+        assertEquals(2, count($nodes));
+        /** @var NodeDo $first */
+        $first = array_values($nodes)[0];
+        assertEquals(2, $first->getParentId());
     }
 
     public function testExecute() {

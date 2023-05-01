@@ -498,14 +498,38 @@ abstract class AbstractDao {
                                 int     $offset = 0,
                                 int     $limit = PHP_INT_MAX,
                                 Closure $func = null): array {
+        $sql = /** @lang text */
+            "SELECT * FROM `" . $this->getTableName() . "` WHERE " . $where_clause
+            . " LIMIT " . $offset . "," . $limit . ";";
+        return $this->selectSql($sql, $func);
+    }
+
+    /**
+     * Select Entities with a sql statement
+     *
+     * The optional {@link $func} receives selected Entities and can decide what key
+     * the Entity will have in the returned Entity[] array.
+     * Default: the returned Entity[] array has Entity IDs as keys.
+     * ```
+     * $func = function(Entity $entity): int {
+     *     return  $entity->getID();
+     * };
+     * ```
+     * If the {@link $sql} selects not all fields from the designated table or selects from tables other than
+     * the designated, the result is unpredictable.
+     *
+     * @param string $sql sql selecting all fields from designated table
+     * @param Closure|null $func if given decides which keys the returned array will have
+     * @return Entity[] array of Entities or empty array if none found
+     * @throws Exception
+     */
+    public function selectSql(string  $sql,
+                              Closure $func = null): array {
         if (is_null($func)) {
             $func = function (Entity $entity): int {
                 return $entity->getID();
             };
         }
-        $sql = /** @lang text */
-            "SELECT * FROM `" . $this->getTableName() . "` WHERE " . $where_clause
-            . " LIMIT " . $offset . "," . $limit . ";";
         Log::debug($sql);
         /** @var $do Entity */
         $do = $this->getDataObjectName();
