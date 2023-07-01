@@ -37,8 +37,16 @@ use function mysqli_get_client_info;
  *     "database" => {string},     // required
  *     "port" => {int},            // optional, default 3306
  *     "persistent" => {bool},     // optional, default true
+ *     "use_parameterized_queries" => {bool} // optional, default true
  * ];
  * ```
+ *
+ * A connection via *libmysqlclient* will not allow binding parameters in execute and produce the
+ * following error:
+ * ```
+ * ArgumentCountError: Binding parameters in execute is not supported with libmysqlclient
+ * ```
+ * In that case set *use_parameterized_queries* to *false*.
  *
  * A third method of setting the configuration is by programmatically calling
  * {@link MysqlConnector::setConfiguration()} with the appropriate array, like shown above.
@@ -160,6 +168,15 @@ class MysqlConnector {
             }
         }
         return $this->mysqli;
+    }
+
+    /**
+     * The value of the configuration option use_parameterized_queries
+     * @return bool default *true*
+     * @throws Exception
+     */
+    public function useParameterizedQueries(): bool {
+        return $this->getConfiguration()["use_parameterized_queries"] ?? true;
     }
 
     /**

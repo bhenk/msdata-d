@@ -13,11 +13,14 @@ use function array_reverse;
 use function array_slice;
 use function array_values;
 use function count;
+use function implode;
 use function is_bool;
 use function is_null;
 use function mysqli_report;
 use function rtrim;
 use function str_repeat;
+use function str_replace;
+use function substr;
 
 /**
  * Data Access Object with basic functionality
@@ -210,6 +213,22 @@ abstract class AbstractDao {
                 return $entity->getID();
             };
         }
+        if (MysqlConnector::get()->useParameterizedQueries()) {
+            return $this->insertBatchP($entity_array, $func, $insertID);
+        } else {
+            return $this->insertBatchNp($entity_array, $func, $insertID);
+        }
+    }
+
+    /**
+     * Insert Batch with parameterized query
+     * @param array $entity_array
+     * @param Closure $func
+     * @param bool $insertID
+     * @return Entity[]
+     * @throws ReflectionException
+     */
+    private function insertBatchP(array $entity_array, Closure $func, bool $insertID = false): array {
         $sql = $this->getPrepareInsertStatement($insertID);
         $new_entities = [];
         $stmt = null;
@@ -270,6 +289,56 @@ abstract class AbstractDao {
     }
 
     /**
+     * Insert batch with statements, not parameterized
+     * @param array $entity_array
+     * @param Closure $func
+     * @param bool $insertID
+     * @return Entity[]
+     * @throws Exception
+     */
+    private function insertBatchNp(array $entity_array, Closure $func, bool $insertID = false): array {
+        $s1 = /** @lang text */
+            "INSERT INTO " . $this->getTableName() . " (";
+        $s3 = ") VALUES (";
+        $ID_passed = false;
+        $name_array = [];
+        foreach ($this->getDoParents() as $parent) {
+            foreach ($parent->getProperties() as $prop) {
+                $name = $prop->getName();
+                if ($name != "ID" or ($insertID and !$ID_passed)) {
+                    $name_array[] = $name;
+                }
+                if ($name == "ID") $ID_passed = true;
+            }
+        }
+        $sql = $s1 . implode(", ", $name_array) . $s3;
+        $new_entities = [];
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            $conn = MysqlConnector::get()->getConnector();
+            $row_count = 0;
+            foreach ($entity_array as $entity) {
+                $arr = array_map(function ($x) {
+                    return is_null($x) ? "NULL" : $x;
+                }, $entity->toArray());
+                $offset = $insertID ? 0 : 1;
+                $values = "'" . implode("', '", array_slice(array_values($arr), $offset)) . "');";
+                $values = str_replace("'NULL'", "NULL", $values);
+                $conn->query($sql . $values);
+                $ID = $conn->insert_id;
+                $new_entity = $entity->clone($ID);
+                $new_entities[$func($new_entity)] = $new_entity;
+                Log::debug("Inserted " . $entity::class . ", ID = " . $ID);
+                $row_count += $conn->affected_rows;
+            }
+            Log::debug("INSERT row count: " . $row_count);
+        } catch (Throwable $e) {
+            throw new Exception("Could not insert Entity", 201, $e);
+        }
+        return $new_entities;
+    }
+
+    /**
      * Update the given Entity
      *
      * @param Entity $entity persisted Entity to update
@@ -289,6 +358,20 @@ abstract class AbstractDao {
      */
     public function updateBatch(array $entity_array): int {
         if (empty($entity_array)) return 0;
+        if (MysqlConnector::get()->useParameterizedQueries()) {
+            return $this->updateBatchP($entity_array);
+        } else {
+            return $this->updateBatchNp($entity_array);
+        }
+    }
+
+    /**
+     * Update batch with parameterized execution
+     * @param Entity[] $entity_array
+     * @return int
+     * @throws Exception
+     */
+    private function updateBatchP(array $entity_array): int {
         $sql = $this->getPrepareUpdateStatement();
         // UPDATE tbl_name SET field1=?, field2=?, (...), WHERE ID=?
         $stmt = null;
@@ -342,6 +425,38 @@ abstract class AbstractDao {
     }
 
     /**
+     * Update batch with statements, not parameterized
+     * @param Entity[] $entity_array
+     * @return int
+     * @throws Exception
+     */
+    private function updateBatchNp(array $entity_array): int {
+        $sql = "UPDATE " . $this->getTableName() . " SET ";
+        $row_count = 0;
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            $conn = MysqlConnector::get()->getConnector();
+            foreach ($entity_array as $entity) {
+                $updates = "";
+                foreach (array_slice($entity->toArray(), 1) as $name => $value) {
+                    if (is_null($value)) {
+                        $updates .= "`$name`=NULL, ";
+                    } else {
+                        $updates .= "`$name`='$value', ";
+                    }
+                }
+                $updates = substr($updates, 0, -2) . " WHERE ID=" . $entity->getID() . ";";
+                Log::debug($sql . $updates);
+                $conn->query($sql . $updates);
+                $row_count += $conn->affected_rows;
+            }
+        } catch (Throwable $e) {
+            throw new Exception("Could not update Entity", 202, $e);
+        }
+        return $row_count;
+    }
+
+    /**
      * Delete the row with the given ID
      *
      * @param int $ID the :tech:`ID` to delete
@@ -361,6 +476,20 @@ abstract class AbstractDao {
      */
     public function deleteBatch(array $ids): int {
         if (empty($ids)) return 0;
+        if (MysqlConnector::get()->useParameterizedQueries()) {
+            return $this->deleteBatchP($ids);
+        } else {
+            return $this->deleteBatchNp($ids);
+        }
+    }
+
+    /**
+     * Delete batch with parameterized execution
+     * @param int[] $ids
+     * @return int
+     * @throws Exception
+     */
+    private function deleteBatchP(array $ids): int {
         $sql = $this->getPrepareDeleteStatement(count($ids));
         Log::debug($sql);
         $stmt = null;
@@ -388,6 +517,28 @@ abstract class AbstractDao {
     }
 
     /**
+     * Delete batch with statement, not parameterized
+     * @param int[] $ids
+     * @return int
+     * @throws Exception
+     */
+    private function deleteBatchNp(array $ids): int {
+        $clause = implode(" OR ID=", $ids);
+        $sql = /** @lang text */
+            "DELETE FROM " . $this->getTableName() . " WHERE ID=" . $clause . ";";
+        Log::debug($sql);
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            $conn = MysqlConnector::get()->getConnector();
+            $conn->query($sql);
+            $rows = $conn->affected_rows;
+        } catch (Throwable $e) {
+            throw new Exception("Could not delete Entity", 203, $e);
+        }
+        return $rows;
+    }
+
+    /**
      * Fetch the Entity with the given ID
      *
      * @param int $ID the :tech:`ID` to fetch
@@ -410,6 +561,19 @@ abstract class AbstractDao {
      */
     public function selectBatch(array $ids): array {
         if (empty($ids)) return [];
+        if (MysqlConnector::get()->useParameterizedQueries()) {
+            return $this->selectBatchP($ids);
+        } else {
+            return $this->selectBatchNp($ids);
+        }
+    }
+
+    /**
+     * @param int[] $ids
+     * @return Entity[]
+     * @throws Exception
+     */
+    private function selectBatchP(array $ids): array {
         $sql = $this->getPrepareSelectStatement(count($ids));
         Log::debug($sql);
         $stmt = null;
@@ -443,6 +607,19 @@ abstract class AbstractDao {
             "SELECT * FROM `" . $this->getTableName() . "` WHERE `ID`=?";
         $sql .= str_repeat(" OR `ID`=?", $count - 1);
         return $sql;
+    }
+
+    /**
+     * @param int[] $ids
+     * @return Entity[]
+     * @throws Exception
+     */
+    private function selectBatchNp(array $ids): array {
+        $clause = implode(" OR ID=", $ids);
+        $sql = /** @lang text */
+            "SELECT * FROM " . $this->getTableName()
+            . " WHERE ID=" . $clause . ";";
+        return $this->selectSql($sql);
     }
 
     /**

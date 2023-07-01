@@ -83,9 +83,20 @@ The configuration file should return configuration options as an array:
        "database" => {string},     // required
        "port" => {int},            // optional, default 3306
        "persistent" => {bool},     // optional, default true
+       "use_parameterized_queries" => {bool} // optional, default true
    ];
 
 
+
+A connection via *libmysqlclient* will not allow binding parameters in execute and produce the
+following error:
+
+..  code-block::
+
+   ArgumentCountError: Binding parameters in execute is not supported with libmysqlclient
+
+
+In that case set *use_parameterized_queries* to *false*.
 
 A third method of setting the configuration is by programmatically calling
 :ref:`bhenk\msdata\connector\MysqlConnector::setConfiguration` with the appropriate array, like shown above.
@@ -371,6 +382,35 @@ MysqlConnector::getConnector
 ----
 
 
+.. _bhenk\msdata\connector\MysqlConnector::useParameterizedQueries:
+
+MysqlConnector::useParameterizedQueries
+---------------------------------------
+
+.. table::
+   :widths: auto
+   :align: left
+
+   ========== ====== 
+   predicates public 
+   ========== ====== 
+
+
+**The value of the configuration option use_parameterized_queries**
+
+
+.. code-block:: php
+
+   public function useParameterizedQueries(): bool
+
+
+| :tag6:`return` bool  - default *true*
+| :tag6:`throws` `Exception <https://www.php.net/manual/en/class.exception.php>`_
+
+
+----
+
+
 .. _bhenk\msdata\connector\MysqlConnector::getConfiguration:
 
 MysqlConnector::getConfiguration
@@ -494,4 +534,4 @@ Something like
 
 ----
 
-:block:`Mon, 01 May 2023 14:39:48 +0000` 
+:block:`Sat, 01 Jul 2023 13:02:23 +0000` 

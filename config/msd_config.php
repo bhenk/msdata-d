@@ -7,4 +7,5 @@ return [
     "database" => "msdata",
     "port" => 3306,
     "persistent" => true,
+    "use_parameterized_queries" => true,
 ];

@@ -18,9 +18,8 @@ use function PHPUnit\Framework\assertNotNull;
 use function PHPUnit\Framework\assertNull;
 use function PHPUnit\Framework\assertStringStartsWith;
 use function PHPUnit\Framework\assertTrue;
-use function var_dump;
 
-#[LogAttribute(false)]
+#[LogAttribute(true)]
 class AbstractDaoTest extends TestCase {
     use ConsoleLoggerTrait;
 
@@ -261,6 +260,7 @@ class AbstractDaoTest extends TestCase {
         assertEquals(43, $inserted->getID());
     }
 
+    #[LogAttribute(false)]
     public function testSelectSql() {
         $dao = new NodeDao();
         $dao->createTable(true);
@@ -281,6 +281,7 @@ class AbstractDaoTest extends TestCase {
         assertEquals(2, $first->getParentId());
     }
 
+    #[LogAttribute(false)]
     public function testExecute() {
         $dao = new NodeDao();
         $dao->createTable(true);
