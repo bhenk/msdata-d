@@ -318,8 +318,12 @@ abstract class AbstractDao {
             $conn = MysqlConnector::get()->getConnector();
             $row_count = 0;
             foreach ($entity_array as $entity) {
-                $arr = array_map(function ($x) {
-                    return is_null($x) ? "NULL" : $x;
+                $arr = array_map(function ($x) use ($conn) {
+                    if (is_null($x)) {
+                        return "NULL";
+                    } else {
+                        return $conn->real_escape_string($x);
+                    }
                 }, $entity->toArray());
                 $offset = $insertID ? 0 : 1;
                 $values = "'" . implode("', '", array_slice(array_values($arr), $offset)) . "');";
@@ -442,7 +446,8 @@ abstract class AbstractDao {
                     if (is_null($value)) {
                         $updates .= "`$name`=NULL, ";
                     } else {
-                        $updates .= "`$name`='$value', ";
+                        $esc_value = $conn->real_escape_string($value);
+                        $updates .= "`$name`='$esc_value', ";
                     }
                 }
                 $updates = substr($updates, 0, -2) . " WHERE ID=" . $entity->getID() . ";";

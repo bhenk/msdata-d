@@ -51,7 +51,7 @@ class AbstractDaoTest extends TestCase {
 
     #[LogAttribute(false)]
     public function testInsert(): void {
-        $node = new NodeDo(null, null, "what sunday", "by alias", "zondag", false);
+        $node = new NodeDo(null, null, "what sunday", "by alias", "z'ondag", false);
         $dao = new NodeDao();
         /** @var NodeDo $newNode */
         $newNode = $dao->insert($node);
@@ -63,7 +63,7 @@ class AbstractDaoTest extends TestCase {
     #[LogAttribute(false)]
     public function testInsertBatch() {
         $batch = [
-            new NodeDo(null, null, "name 1", "alias 1", "nature 1", false),
+            new NodeDo(null, null, "name 1", "alias 1", "n`a`ture 1", false),
             new NodeDo(null, 1, "name 2", "alias 2", "nature 2", true),
             new NodeDo(null, 2, "name 3", "alias 3", "nature 3", false),
         ];
@@ -116,7 +116,7 @@ class AbstractDaoTest extends TestCase {
 
     #[LogAttribute(false)]
     public function testUpdate(): void {
-        $node = new NodeDo(null, 12, "node name", "node alias", "node nature");
+        $node = new NodeDo(null, 12, "node n'ame", "node alias", "node nature");
         $dao = new NodeDao();
         /** @var NodeDo $node2 */
         $node2 = $dao->insert($node);
@@ -133,7 +133,7 @@ class AbstractDaoTest extends TestCase {
         $batch = [
             new NodeDo(null, null, "name 1", "alias 1", "nature 1", false),
             new NodeDo(null, 1, "name 2", "alias 2", "nature 2", true),
-            new NodeDo(null, 2, "name 3", "alias 3", "nature 3", false),
+            new NodeDo(null, 2, "name 3", "alias 3", "na''ture 3", false),
         ];
         $dao = new NodeDao();
         $batch2 = $dao->insertBatch($batch);
